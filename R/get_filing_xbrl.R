@@ -1,3 +1,9 @@
+maybe_download <- function(url, dest, useragent) {
+  resp <- httr::GET(url, httr::user_agent(useragent))
+  if (httr::status_code(resp) == 200)
+    writeBin(httr::content(resp, as = "raw"), dest)
+}
+
 find_instance_doc <- function(index_df) {
   ret_df <- index_df[index_df$type == "EX-101.INS", ]
   if(nrow(ret_df) == 0) stop("No EX-101.INS exist")
@@ -79,24 +85,28 @@ get_filing_xbrl <- function(cik, year, form_type, useragent) {
         writeBin(httr::content(xsd_resp, as = "raw"), file.path(tmp_dir, xsd_name))
 
         lab_name <- sub("_htm\\.xml$", "_lab.xml", xml_name)
-        lab_resp <- httr::GET(paste0(base_url, lab_name), httr::user_agent(useragent))
-        httr::stop_for_status(lab_resp)
-        writeBin(httr::content(lab_resp, as = "raw"), file.path(tmp_dir, lab_name))
+        maybe_download(paste0(base_url, lab_name), lab_name, useragent)
+        #lab_resp <- httr::GET(paste0(base_url, lab_name), httr::user_agent(useragent))
+        #httr::stop_for_status(lab_resp)
+        #writeBin(httr::content(lab_resp, as = "raw"), file.path(tmp_dir, lab_name))
 
         pre_name <- sub("_htm\\.xml$", "_pre.xml", xml_name)
-        pre_resp <- httr::GET(paste0(base_url, pre_name), httr::user_agent(useragent))
-        httr::stop_for_status(pre_resp)
-        writeBin(httr::content(pre_resp, as = "raw"), file.path(tmp_dir, pre_name))
+        maybe_download(paste0(base_url, pre_name), pre_name, useragent)
+        #pre_resp <- httr::GET(paste0(base_url, pre_name), httr::user_agent(useragent))
+        #httr::stop_for_status(pre_resp)
+        #writeBin(httr::content(pre_resp, as = "raw"), file.path(tmp_dir, pre_name))
 
         cal_name <- sub("_htm\\.xml$", "_cal.xml", xml_name)
-        cal_resp <- httr::GET(paste0(base_url, cal_name), httr::user_agent(useragent))
-        httr::stop_for_status(cal_resp)
-        writeBin(httr::content(cal_resp, as = "raw"), file.path(tmp_dir, cal_name))
+        maybe_download(paste0(base_url, cal_name), cal_name, useragent)
+        #cal_resp <- httr::GET(paste0(base_url, cal_name), httr::user_agent(useragent))
+        #httr::stop_for_status(cal_resp)
+        #writeBin(httr::content(cal_resp, as = "raw"), file.path(tmp_dir, cal_name))
 
         def_name <- sub("_htm\\.xml$", "_def.xml", xml_name)
-        def_resp <- httr::GET(paste0(base_url, def_name), httr::user_agent(useragent))
-        httr::stop_for_status(def_resp)
-        writeBin(httr::content(def_resp, as = "raw"), file.path(tmp_dir, def_name))
+        maybe_download(paste0(base_url, def_name), def_name, useragent)
+        #def_resp <- httr::GET(paste0(base_url, def_name), httr::user_agent(useragent))
+        #httr::stop_for_status(def_resp)
+        #writeBin(httr::content(def_resp, as = "raw"), file.path(tmp_dir, def_name))
 
         file.path(tmp_dir, xml_name)
       }
