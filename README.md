@@ -1,6 +1,6 @@
 # secfilings
 
-An R package that combines [`edgar`](https://cran.r-project.org/package=edgar) (SEC EDGAR download) and [`XBRL`](https://github.com/your-org/XBRL) (structured financial data parsing) into a unified tool for retrieving and analyzing corporate SEC filings.
+An R package that combines [`edgar`](https://cran.r-project.org/package=edgar) (SEC EDGAR download) and [`XBRL`](https://github.com/jbennett7/XBRL) (structured financial data parsing) into a unified tool for retrieving and analyzing corporate SEC filings.
 
 Personal research tool — not intended for CRAN publication.
 
@@ -25,12 +25,15 @@ xbrl$element   # element metadata (periodType, balance, etc.)
 
 ## Installation
 
-This package depends on two local packages that must be installed first:
-
 ```r
-devtools::install_local("../edgar")
-devtools::install_local("../XBRL")
-devtools::install_local(".")
+# edgar is available on CRAN
+install.packages("edgar")
+
+# XBRL is installed from GitHub
+devtools::install_github("jbennett7/XBRL")
+
+# Install this package from GitHub
+devtools::install_github("jbennett7/secfilings")
 ```
 
 For development (with live reload):
@@ -152,6 +155,6 @@ These are not run by `R CMD check` — run them manually to validate the pipelin
 ## Dependencies
 
 - [`edgar`](https://cran.r-project.org/package=edgar) — SEC EDGAR master index and filing download
-- [`XBRL`](https://github.com/your-org/XBRL) — XBRL/iXBRL instance document parser (local package)
+- [`XBRL`](https://github.com/jbennett7/XBRL) — XBRL/iXBRL instance document parser
 - [`httr`](https://cran.r-project.org/package=httr) — HTTP requests
 - [`jsonlite`](https://cran.r-project.org/package=jsonlite) — JSON parsing
