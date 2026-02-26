@@ -1,0 +1,61 @@
+<SEC-DOCUMENT>0000320193-23-000106.txt
+
+<SEC-HEADER>
+<ACCEPTANCE-DATETIME>20231103060731
+<ACCESSION-NUMBER>0000320193-23-000106
+<TYPE>10-K
+<PUBLIC-DOCUMENT-COUNT>3
+<PERIOD-OF-REPORT>20230930
+<FILED-AS-OF-DATE>20231103
+<FILER>
+<COMPANY-DATA>
+<CIK>0000320193
+<COMPANY-CONFORMED-NAME>Apple Inc.
+</COMPANY-DATA>
+</FILER>
+</SEC-HEADER?
+
+<DOCUMENT>
+<TYPE>10-K
+<FILENAME>aapl-20230930.htm
+<TEXT>
+<html><body><p>Annual report text here.</p></body></html>
+</TEXT>
+</DOCUMENT>
+
+<DOCUMENT>
+<TYPE>EX-101.INS
+<FILENAME>aapl-20230930.xml
+<TEXT>
+<?xml version="1.0" encoding="UTF-8"?>
+<xbrl xmlns="http://www.xbrl.org/2023/instance"
+      xmlns:us-gaap="http://fasb.org/us-gaap/2023"
+      xmlns:iso4217="http://www.xbrl.org/2003/iso4217">
+  <context id="FY2023">
+    <entity>
+      <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+    </entity>
+    <period>
+      <startDate>2022-10-01</startDate>
+      <endDate>2023-09-30</endDate>
+    </period>
+  </context>
+  <unit id="USD">
+    <measure>iso4217:USD</measure>
+  </unit>
+  <us-gaap:Revenues contextRef="FY2023" unitRef="USD" decimals="-6">383285000000</us-gaap:Revenues>
+</xbrl>
+</TEXT>
+</DOCUMENT>
+
+<DOCUMENT>
+<TYPE>EX-101.SCH
+<FILENAME>aapl-20230930.xsd
+<TEXT>
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+</xs:schema>
+</TEXT>
+</DOCUMENT>
+
+</SEC-DOCUMENT>

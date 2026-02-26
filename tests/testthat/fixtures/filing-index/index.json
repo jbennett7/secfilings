@@ -1,0 +1,39 @@
+{
+  "cik": "320193",
+  "accessionNumber": "0000320193-23-000106",
+  "filingDate": "2023-11-03",
+  "reportDate": "2023-09-30",
+  "form": "10-K",
+  "primary_document": "aapl-20230930.htm",
+  "primary_doc_description": "10-K",
+  "documents": [
+    {
+      "sequence": "1",
+      "description": "10-K",
+      "document": "aapl-20230930.htm",
+      "type": "10-K",
+      "size": 8935939
+    },
+    {
+      "sequence": "2",
+      "description": "XBRL INSTANCE DOCUMENT",
+      "document": "aapl-20230930.xml",
+      "type": "EX-101.INS",
+      "size": 876221
+    },
+    {
+      "sequence": "3",
+      "description": "XBRL TAXONOMY EXTENSION SCHEMA",
+      "document": "aapl-20230930.xsd",
+      "type": "EX-101.SCH",
+      "size": 45123
+    },
+    {
+      "sequence": "4",
+      "description": "XBRL TAXONOMY EXTENSION LABELS",
+      "document": "aapl-20230930_lab.xml",
+      "type": "EX-101.LAB",
+      "size": 234567
+    }
+  ]
+}

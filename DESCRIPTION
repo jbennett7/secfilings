@@ -1,0 +1,15 @@
+Package: secfilings
+Title: Parse SEC Filings for data
+Version: 0.0.0.9000
+Authors@R: 
+    person("Joseph", "Bennett", , "jbennett@jbennettconsulting.com", role = c("aut", "cre"))
+Description: Parse SEC Filings using the edgar package and XBRL package.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports: 
+    edgar,
+    httr,
+    jsonlite,
+    XBRL
