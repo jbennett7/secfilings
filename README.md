@@ -53,7 +53,7 @@ devtools::load_all(".")
 
 ## Usage
 
-### `get_filings(cik, accessionNumber, useragent)'
+### `get_filings(cik, accessionNumber, useragent)' 
 
 Downloads the sgml filing.
 
