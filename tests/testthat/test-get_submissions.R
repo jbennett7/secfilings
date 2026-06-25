@@ -11,4 +11,5 @@ test_that("get_submissions can get the submissions list", {
     get_submissions(ticker, useragent, cache = test_cache)
     df <- readr::read_csv(paste0(test_cache, "/submissions/", cik, ".csv"), na = "")
     expect_equal(df[df$accessionNumber == test_instance,]$filingDate, as.Date(expected))
+    unlink(test_cache, recursive=TRUE)
 })

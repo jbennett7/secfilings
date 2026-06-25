@@ -13,7 +13,6 @@ get_cik <- function(ticker, useragent, cache="./.cache") {
         readr::read_csv(paste0(cache, "/tickers.csv"), na = "")
     }, error = function(e) {
         download_tickers(useragent, cache)
-        readr::read_csv(paste0(cache, "/tickers.csv"), na = "")
     })
     # Convert ticker symbol to all UPPER case characters.
     ticker <- toupper(ticker)

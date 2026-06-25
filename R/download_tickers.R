@@ -6,6 +6,7 @@
 #' @importFrom readr write_csv
 #' @importFrom httr GET user_agent stop_for_status content
 #' @importFrom dplyr bind_rows
+#' @return data.frame containing the downloaded list of tickers to cik.
 download_tickers <- function(useragent, cache="./.cache") {
     message("Downloading tickers...")
 
@@ -23,4 +24,5 @@ download_tickers <- function(useragent, cache="./.cache") {
     df <- do.call(dplyr::bind_rows,
                   lapply(httr::content(response), as.data.frame))
     readr::write_csv(df, paste0(cache, "/tickers.csv"), na = "")
+    return (df)
 }

@@ -11,4 +11,5 @@ test_that("get_filing downloads a clean copy.", {
     lines <- readLines(file_path)
     result <- sub("^.+([0-9]{8})$", "\\1", lines[grepl("CONFORMED PERIOD OF REPORT", lines)])
     expect_equal(result, expected)
+    unlink(test_cache, recursive=TRUE)
 })
