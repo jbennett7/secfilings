@@ -66,7 +66,7 @@ document, writes it to `out_dir`, and returns the path.
 xml_path <- extract_instance("/path/to/filing.txt")
 ```
 
-### `get_cik(ticker)'
+### `get_cik(ticker)`
 
 Returns the cik for the company represented by the ticker symbol.
 
