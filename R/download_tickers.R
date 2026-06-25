@@ -23,6 +23,8 @@ download_tickers <- function(useragent, cache="./.cache") {
     # Convert to a csv file to store and retrieve later.
     df <- do.call(dplyr::bind_rows,
                   lapply(httr::content(response), as.data.frame))
+
+    # Write to file and return data.frame.
     readr::write_csv(df, paste0(cache, "/tickers.csv"), na = "")
     return (df)
 }

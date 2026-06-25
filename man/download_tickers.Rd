@@ -12,6 +12,9 @@ download_tickers(useragent, cache = "./.cache")
 \item{cache, }{Character. Temporary cache for storing the tickers as a
 csv file.}
 }
+\value{
+data.frame containing the downloaded list of tickers to cik.
+}
 \description{
 Download the JSON file of ticker to cik numbers from EDGAR
 }
