@@ -1,0 +1,115 @@
+---
+title: "tutorial"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+You will need to load the XBRL package found at
+[github:jbennett7/XBRL](https://github.com/jbennett7/XBRL)
+
+```{r setup}
+library(secfilings)
+library(XBRL)
+```
+
+Remember to set up a user agent, and for this example we need a place to put
+the extracted XBRL. We will put it in "./db".
+
+```{r useragent}
+useragent <- "Your User Agent user@example.com"
+database <- "./db"
+```
+
+```{r populate_database}
+populate_database <- function(tickers, useragent, database = "./db") {
+    # Create the database directory if it does not exist.
+    if (!dir.exists(database)) dir.create(database)
+
+    # If we are going to run this multiple times, lets make sure we don't
+    # download filings we already have. (This assumes that accession files are
+    # unique in EDGAR even across companies. I have not verified this is true.)
+    local_accessions <- unique(sub("^([0-9-]+)_.+", "\\1",
+                               basename(list.files(database, recursive=TRUE))))
+
+    # We can pass this function multiple tickers.
+    for (ticker in tickers) {
+        # Lookup the cik of the ticker.
+        cik <- get_cik(ticker, useragent)
+        # get the company submission list. (Needed for the accession numbers.)
+        df  <- get_submissions(ticker, useragent)
+        # Only download 10-Q and 10-K filings from these dates.
+        filter <- df$form %in% c("10-Q", "10-K") &
+                  df$reportDate > as.Date("2021-12-31") &
+                  df$reportDate < as.Date("2027-01-01")
+        # These are the accession numbers associated with the filings we want.
+        accessions <- df[filter,]$accessionNumber
+
+        # Do we already have these sec filings?
+        dl_accessions <- accessions[!(accessions %in% local_accessions)]
+        for (acc in dl_accessions) {
+            # scratch directory used to extract the files from the sgml file.
+            dir <- "/tmp/xbrl"
+            # We need a clean directory so make sure it doesn't exist
+            # and create it.
+            if (dir.exists(dir)) unlink(dir, recursive=TRUE)
+            dir.create(dir)
+            message(paste0("Processing ", acc))
+            # Download the sgml file from EDGAR
+            sgml <- get_filings(cik, acc, useragent)
+            # Extract the files from the sgml file.
+            extract_instance(sgml, out_dir=dir)
+            # Identify the XBRL instance file
+            inst <- list.files(dir, pattern="_htm.xml", full.names=TRUE)
+            # This is where the XBRL data will exist in CSV files.
+            # The files will be i.e.: "./db/12345/0000-00-01232_facts.csv"
+            prefix.out <- paste(database, cik, acc, sep="/")
+            # If the directory doesn't exist, create it.
+            if (!dir.exists(dirname(prefix.out)))
+                dir.create(dirname(prefix.out), recursive=TRUE)
+            # Extract the XBRL data to the directory with prefix.
+            xbrlDoAll(inst, prefix.out=prefix.out)
+        }
+    }
+}
+```
+
+```{r run everything}
+tickers <- c("T", "AAPL", "GOOG")
+populate_database(tickers, useragent)
+```
+
+Now that we have generated the database. Lets test by getting one of the facts.
+
+```{r parse database}
+prefix <- "./db/0001652044/0001652044-24-000079"
+facts  <- read.csv(paste0(prefix, "_facts.csv"))
+dei    <- facts[grepl("^dei_Document", facts$elementId),
+                c("elementId", "fact", "contextId")]
+print(dei)
+```
+
+Lets see the operating income of the company. (I will not interpret this).
+
+```{r lets get the operating income}
+# We already have the facts table.
+ctx  <- read.csv(paste0(prefix, "_contexts.csv"))
+dims <- read.csv(paste0(prefix, "_dimensions.csv"))
+
+oi <- facts[facts$elementId == "us-gaap_OperatingIncomeLoss",]
+oi <- merge(oi, ctx, by = "contextId")
+
+oi$hasDimension <- oi$contextId %in% dims$contextId
+
+print(unique(oi[, c("contextId", "fact", "scale",
+                    "startDate", "endDate", "instant", "hasDimension")]))
+```
