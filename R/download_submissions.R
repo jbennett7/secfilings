@@ -4,6 +4,7 @@
 #' @param useragent, Character. Required by SEC: "Name email@domain.com"
 #' @param cache, Character. Temporary cache for storing the tickers as a
 #'   csv file.
+#' @importFrom tibble as.tibble
 #' @return data.frame containing the downloaded submissions.
 download_submissions <- function(cik, useragent, cache="./.cache") {
     message("Downloading submissions...")
@@ -30,5 +31,5 @@ download_submissions <- function(cik, useragent, cache="./.cache") {
     
     # Save to file and return data.frame.
     readr::write_csv(df, submissions, na = "")
-    return(df)
+    return(tibble::as.tibble(df))
 }

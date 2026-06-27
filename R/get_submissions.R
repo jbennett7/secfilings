@@ -1,4 +1,4 @@
-#' Retrieve the JSON document of company filing submissions to EDGAR
+#' Retrieve the company EDGAR submissions.
 #'
 #' @param ticker, Character. Ticker symbol of the company.
 #' @param useragent, Character. Required by SEC: "Name email@domain.com"
@@ -12,20 +12,8 @@ get_submissions <- function(ticker, useragent, cache = "./.cache") {
     cik <- get_cik(ticker, useragent)
     if (is.na(cik)) stop("Could not get cik for ticker.")
     submissions <- paste0(cache, "/submissions/", cik, ".csv")
-    if (!dir.exists(dirname(submissions))) dir.create(dirname(submissions), recursive=TRUE) 
     if (!file.exists(submissions)) {
-        message(paste0("Downloading submissions for ", toupper(ticker), "..."))
-        url <- paste0("https://data.sec.gov/submissions/CIK", cik, ".json")
-        response <- httr::GET(url, httr::user_agent(useragent))
-        httr::stop_for_status(response)
-        content <- httr::content(response)
-        df <- data.frame(lapply(content$filings$recent, function(x) {
-            vapply(x, function(el)
-                if (is.null(el)) NA_character_
-                else as.character(el[[1]]), character(1))
-        }))
-        readr::write_csv(df, submissions, na = "")
-        return(df)
+        return(download_submissions(cik, useragent, cache))
     } else {
         df <- readr::read_csv(submissions, na = "")
         return(df)
