@@ -8,15 +8,13 @@
 #' @importFrom readr write_csv read_csv
 #' @return data.frame, Character. The submission list in data frame format.
 #' @export
-get_submissions <- function(ticker, useragent, cache = "./.cache") {
-    cik <- get_cik(ticker, useragent)
+get_submissions <- function(cik, useragent, cache = "./.cache") {
     if (is.na(cik)) stop("Could not get cik for ticker.")
     submissions <- paste0(cache, "/submissions/", cik, ".csv")
     if (!file.exists(submissions)) {
         return(download_submissions(cik, useragent, cache))
     } else {
-        df <- readr::read_csv(submissions, na = "")
-        return(df)
+        suppressWarnings(readr::read_csv(submissions, na = ""))
     }
 }
 
