@@ -1,0 +1,99 @@
+---
+title: "statement_analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{statement_analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(secfilings)
+library(XBRL)
+library(dplyr)
+
+# Need when accessing data from EDGAR.
+useragent <- "Your Name yourname@example.com"
+```
+
+A good use of `secfilngs` and `XBRL` is to analyze financial statements. In the
+`balance_sheet.Rmd` vignette we constructed a balance sheet for Google. Here we
+will take specific facts and do ratio analysis with Google and similar cloud
+competitors: Amazon and Microsoft.
+
+This will be very crude at first. I just want to show how secfilings and XBRL
+are used together. More sophisticated functions can be created using these
+primitives.
+
+First some helper functions
+
+```{r helper-functions}
+# Only pull the latest submission
+get_latest_xbrl <- function(ticker, useragent) {
+    cik <- secfilings::get_cik(ticker, useragent)
+    
+    accn <- secfilings::get_submissions(cik, useragent) |>
+        filter(grepl("^10-[KQ](?:\\/A)?$", form)) |>
+        slice(1) |> pull(accessionNumber)
+
+    sgml <- secfilings::get_filings(cik, accn, useragent)
+    outdir <- secfilings::extract_instance(sgml)
+    
+    inst <- list.files(outdir,
+        pattern="(?:\\d{8}|_htm)\\.xml$", full.names=TRUE)
+    
+    xbrl <- XBRL::xbrlDoAll(inst)
+    
+    unlink(outdir, recursive=TRUE)
+    return(xbrl)
+}
+
+# Extract an instant fact that matches element_id
+get_instant_fact_value <- function(xbrl, element_id) {
+    xbrl$fact |>
+        filter(elementId == element_id) |>
+        inner_join(xbrl$context |> filter(instant), by = "contextId") |>
+        anti_join(xbrl$dimension, by = "contextId") |>
+        mutate(fact = as.numeric(fact)) |>
+        filter(endDate == max(endDate)) |>
+        slice(1) |>
+        pull(fact)
+}
+
+# First ratio: the current ratio
+current_ratio <- function(xbrl) {
+    current_assets <- get_instant_fact_value(xbrl, "us-gaap_AssetsCurrent")
+    current_liabilities <- get_instant_fact_value(xbrl, "us-gaap_LiabilitiesCurrent")
+    current_assets / current_liabilities
+}
+
+# Second ratio: total debt ratio
+total_debt_ratio <- function(xbrl) {
+    total_assets <- get_instant_fact_value(xbrl, "us-gaap_Assets")
+    total_equity <- get_instant_fact_value(xbrl,
+        "us-gaap_StockholdersEquity")
+    print(total_equity)
+    total_debt_ratio <- (total_assets - total_equity) / total_assets
+}
+```
+
+```{r download-latest-quarter}
+goog_xbrl <- get_latest_xbrl('GOOG', useragent)
+goog_cr <- current_ratio(goog_xbrl)
+goog_tdr <- total_debt_ratio(goog_xbrl)
+amzn_xbrl <- get_latest_xbrl('AMZN', useragent)
+amzn_cr <- current_ratio(amzn_xbrl)
+amzn_tdr <- total_debt_ratio(amzn_xbrl)
+msft_xbrl <- get_latest_xbrl('MSFT', useragent)
+msft_cr <- current_ratio(msft_xbrl)
+msft_tdr <- total_debt_ratio(msft_xbrl)
+c(goog_cr, amzn_cr, msft_cr)
+c(goog_tdr, amzn_tdr, msft_tdr)
+```
