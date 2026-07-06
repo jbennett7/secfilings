@@ -1,0 +1,202 @@
+---
+title: "Generating a balance sheet"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Generating a balance sheet}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This is an example usage to rebuild the balance sheet of a company's most recent
+filing. This may not work for all filings. I will show where the common breaks
+are and how it can be corrected.
+
+# Setup
+
+You will need to load the XBRL package found at
+[github:jbennett7/XBRL](https://github.com/jbennett7/XBRL)
+
+```{r setup}
+# Load secfilings (this package)
+devtools::load_all('.')
+library(dplyr)
+library(XBRL)
+library(purrr)
+library(tidyr)
+```
+
+You will need to set a user agent in order to download files from SEC EDGAR.
+
+```{r useragent}
+useragent <- "Your Name yourname@example.com"
+```
+
+# Downloading the filing
+
+We will download the most recent filing of Google from EDGAR. (`slice(1)` works
+because `get_submissions` returns the rows in reverse-chronological order which
+is how EDGAR's JSON is ordered.)  EDGAR uses accession numbers to uniquely
+identify SGML documents. See `filing_urls` in `R/get_filings.R` for the
+downloading URL. When extracting the data from the SGML file, multiple files are
+generated inside a temporary directory. Ensure that the directory is cleaned up
+before extracting multiple filings. `xbrlDoAll` will generate a list of data
+frames that will hold all the XBRL data. See the `XBRL` package for more
+information.
+
+```{r download-extract-filing}
+cik <- get_cik('GOOG', useragent)
+
+# We use the accessionNumber to retrieve the file see `get_filings`
+accn <- get_submissions(cik, useragent) |>
+    filter(grepl("^10-[KQ](?:\\/A)?$", form)) |>
+    slice(1) |> pull(accessionNumber)
+
+sgml <- get_filings(cik, accn, useragent)
+
+# The file is extracted into multiple files placed in a temporary directory.
+outdir <- extract_instance(sgml)
+
+inst <- list.files(outdir,
+    pattern="(?:\\d{8}|_htm)\\.xml", full.names=TRUE)
+
+# The data is stored in multiple data frames in this list.
+xbrl_data <- xbrlDoAll(inst)
+
+# Clean up the output directory after generating the xbrl data list.
+#unlink(outdir, recursive=TRUE)
+```
+
+## Locating the balance sheet role
+
+This is where the code may break for different companies. It all depends on what
+the company calls the "balance sheet." Most companies will call it
+consolidated balance sheets. If you search the `xbrl_data$role` data frame for
+`type == 'Statement'`. You will see what the company calls each of its financial
+statements. The `ignore.case` option is used because sometimes a company will
+label it something like: `CONSOLIDATED BALANCE SHEETS` or `Consolidated balance
+sheets` or `Consolidated Balance Sheets`.
+
+```{r get-role-id}
+balance_sheet_role_id <- xbrl_data$role |>
+    filter(
+        type == 'Statement',
+        grepl('balance sheets?$', ignore.case=TRUE, description)) |>
+    pull(roleId)
+```
+
+## Building the presentation tree
+
+Here we tap several data frames within the xbrl data. We need parent/child
+relationships between each of the facts, the order of the facts and what their
+preferred label is. Please review XBRL concepts such as `hypercubes` and
+`dimensions` for more information about how XBRL organizes and represents
+multidimensional facts. (We will be using dimensionless facts because we are
+interested in company wide data. Please see explaination in the last section.)
+Then we get the label strings and provide a function for applying the correct
+label to the correct element.
+
+```{r presentation-label}
+pres <- xbrl_data$presentation |>
+    filter(roleId == balance_sheet_role_id) |>
+    select(fromElementId, toElementId, order, preferredLabel) |>
+    mutate(order = as.numeric(order))
+
+elements <- xbrl_data$element |>
+    select(elementId, type, substitutionGroup, abstract) |>
+    mutate(structural = substitutionGroup %in%
+        c("xbrldt:hypercubeItem", "xbrldt:dimensionItem") |
+        type == "dtr-types:domainItemType")
+
+labels <- xbrl_data$label |>
+    select(elementId, labelRole, labelString)
+
+label_for <- function(elt, preferred_role) {
+    cand <- labels |> filter(elementId == elt)
+    hit <- cand |> filter(labelRole == preferred_role)
+    if (nrow(hit) == 0) hit <- cand |> filter(labelRole == "http://www.xbrl.org/2003/role/label")
+    if (nrow(hit) == 0) return(elt)
+    hit$labelString[1]
+}
+```
+
+## Flattening the tree into statement order
+
+We define two more functions for searching through and flattening the
+presentation tree. Another fragile point is that `root` assumes exactly one
+root. If a filer's presentation linkbase has multiple disconnected top-level
+nodes, `root` becomes a vector and `flatten()` isn't written to hand that.
+
+```{r dfs-over-tree}
+flatten <- function(id, depth, preferred_role, seq_env) {
+    is_struct <- elements$structural[match(id, elements$elementId)]
+    is_struct <- isTRUE(is_struct)
+    row <- NULL
+    if (!is_struct) {
+        seq_env$n <- seq_env$n + 1
+        row <- tibble(seq = seq_env$n, elementId = id, depth = depth,
+                       negated = grepl("negated", preferred_role %||% ""),
+                       label = label_for(id, preferred_role %||%
+                           "http://www.xbrl.org/2003/role/label"))
+    }
+    next_depth <- if (is_struct) depth else depth + 1
+    kids <- pres |> filter(fromElementId == id) |> arrange(order)
+    child_rows <- pmap(list(kids$toElementId, kids$preferredLabel),
+                        \(cid, plabel) flatten(cid, next_depth, plabel, seq_env))
+    bind_rows(row, bind_rows(child_rows))
+}
+
+`%||%` <- function(a, b) if (is.null(a) || is.na(a)) b else a
+
+root <- setdiff(pres$fromElementId, pres$toElementId)
+seq_env <- new.env()
+seq_env$n <- 0L
+statement <- flatten(root, depth = 0, preferred_role = NA, seq_env = seq_env)
+statement <- statement |> filter(elementId != root) # drop the [Abstract] doc-title node
+```
+
+## Extracting the values
+
+ We need to ensure we get the correct facts. Some facts are part of company
+ segments. For example "APAC" for Asian operations. These facts will carry the
+ same name, but will have a dimension to them. We need to ensure we get company
+ wide values, not segmented values. In practice, this means the values are
+ "dimensionless". We also need to ensure the facts are instant facts, not
+ duration facts. Balance Sheets are point in time documents.
+
+```{r pull-data}
+elt_ids <- unique(statement$elementId)
+values <- xbrl_data$fact |>
+    filter(elementId %in% elt_ids) |>
+    inner_join(xbrl_data$context |> filter(instant), by="contextId") |>
+    anti_join(xbrl_data$dimension, by="contextId") |>
+    distinct(elementId, endDate, fact, decimals) |>
+    mutate(fact = as.numeric(fact),
+           precision = if_else(decimals == "INF", Inf, suppressWarnings(as.numeric(decimals)))) |>
+    group_by(elementId, endDate) |>
+    slice_max(precision, n = 1, with_ties = FALSE) |>
+    ungroup() |>
+    select(-decimals, -precision)
+
+date_cols <- head(sort(unique(values$endDate), decreasing = TRUE), 2)
+values <- values |> filter(endDate %in% date_cols)
+
+wide <- values |>
+    pivot_wider(names_from = endDate, values_from = fact) |>
+    select(elementId, all_of(date_cols))
+
+balance_sheet <- statement |>
+    left_join(wide, by = "elementId") |>
+    arrange(seq) |>
+    mutate(across(all_of(date_cols), ~ if_else(negated, -.x, .x))) |>
+    mutate(display_label = paste0(strrep("  ", depth), label)) |>
+    select(display_label, all_of(date_cols))
+
+print(balance_sheet, n = Inf)
+```
