@@ -21,7 +21,7 @@ filing_urls <- function(cik, accession) {
 #' @param useragent, Character. Required by SEC: "Name email@domain.com".
 #' @param cache, Character. Temporary cache for storing the tickers as a
 #'   csv file.
-#' @importFrom httr GET user_agent stop_for_status content
+#' @importFrom httr RETRY user_agent stop_for_status content
 #' @return A data frame with columns: sequence, filename, type, description, size.
 #' @export
 get_filings <- function(cik, accession, useragent, cache = "./.cache") {
@@ -34,7 +34,8 @@ get_filings <- function(cik, accession, useragent, cache = "./.cache") {
     for (i in seq_along(urls)) {
         if (!file.exists(file_paths[i])) {
             message(paste0("Downloading filing: ", accession))
-            response <- httr::GET(urls[i], httr::user_agent(useragent))
+            response <- httr::RETRY("GET", urls[i], httr::user_agent(useragent),
+                                    times = 5, pause_base = 1, pause_cap = 30)
             httr::stop_for_status(response)
             con <- file(file_paths[i], "wb")
             writeBin(httr::content(response, as = "raw"), con)

@@ -2,21 +2,21 @@
 % Please edit documentation in R/get_submissions.R
 \name{get_submissions}
 \alias{get_submissions}
-\title{Retrieve the JSON document of company filing submissions to EDGAR}
+\title{Retrieve the company EDGAR submissions.}
 \usage{
-get_submissions(ticker, useragent, cache = "./.cache")
+get_submissions(cik, useragent, cache = "./.cache")
 }
 \arguments{
-\item{ticker, }{Character. Ticker symbol of the company.}
-
 \item{useragent, }{Character. Required by SEC: "Name email@domain.com"}
 
 \item{cache, }{Character. Temporary cache for storing the tickers as a
 csv file.}
+
+\item{ticker, }{Character. Ticker symbol of the company.}
 }
 \value{
 data.frame, Character. The submission list in data frame format.
 }
 \description{
-Retrieve the JSON document of company filing submissions to EDGAR
+Retrieve the company EDGAR submissions.
 }

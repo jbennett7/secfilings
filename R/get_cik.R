@@ -10,7 +10,9 @@
 get_cik <- function(ticker, useragent, cache="./.cache") {
     # Try to read the tickers csv file, generate it if it doens't exist.
     df <- tryCatch({
-        readr::read_csv(paste0(cache, "/tickers.csv"), na = "")
+        suppressMessages(
+            readr::read_csv(paste0(cache, "/tickers.csv"), na = "")
+        )
     }, error = function(e) {
         download_tickers(useragent, cache)
     })

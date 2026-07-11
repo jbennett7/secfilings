@@ -4,8 +4,7 @@
 #' @param useragent, Character. Required by SEC: "Name email@domain.com"
 #' @param cache, Character. Temporary cache for storing the tickers as a
 #'   csv file.
-#' @importFrom httr GET user_agent stop_for_status content
-#' @importFrom readr write_csv read_csv
+#' @importFrom readr write_csv read_csv cols col_character
 #' @return data.frame, Character. The submission list in data frame format.
 #' @export
 get_submissions <- function(cik, useragent, cache = "./.cache") {
@@ -14,7 +13,13 @@ get_submissions <- function(cik, useragent, cache = "./.cache") {
     if (!file.exists(submissions)) {
         return(download_submissions(cik, useragent, cache))
     } else {
-        suppressWarnings(readr::read_csv(submissions, na = ""))
+        suppressMessages(readr::read_csv(submissions,
+                        na = "",
+                        show_col_types=FALSE,
+                        # act = "NE" is a legitimate SEC data,
+                        #   but read_csv guesses act as numeric.
+                        col_types = readr::cols(act = readr::col_character())) |>
+        mutate(filingDate = as.character(filingDate)))
     }
 }
 
