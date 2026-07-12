@@ -6,7 +6,7 @@ get_company <- function(cik, useragent, cache="./.cache") {
         download_tickers(useragent, cache)
     })
     cik <- sub("^0+", "", cik)
-    entry <- unique(df[df$cik_str == cik,]$title)
+    entry <- df[df$cik_str == cik,]$title
     if (length(entry) == 0) return(NA_character_)
     return(entry)
 }

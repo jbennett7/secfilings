@@ -5,6 +5,7 @@
 #' @param cache, Character. Temporary cache for storing the tickers as a
 #'   csv file.
 #' @importFrom readr write_csv read_csv cols col_character
+#' @importFrom dplyr mutate
 #' @return data.frame, Character. The submission list in data frame format.
 #' @export
 get_submissions <- function(cik, useragent, cache = "./.cache") {
@@ -13,13 +14,13 @@ get_submissions <- function(cik, useragent, cache = "./.cache") {
     if (!file.exists(submissions)) {
         return(download_submissions(cik, useragent, cache))
     } else {
-        suppressMessages(readr::read_csv(submissions,
+        suppressMessages(read_csv(submissions,
                         na = "",
                         show_col_types=FALSE,
                         # act = "NE" is a legitimate SEC data,
                         #   but read_csv guesses act as numeric.
                         col_types = readr::cols(act = readr::col_character())) |>
-        mutate(filingDate = as.character(filingDate)))
+        mutate(filingDate = as.Date(filingDate)))
     }
 }
 

@@ -1,4 +1,4 @@
-useragent <- "Joseph Bennett jbennett@jbennettconsulting.com"
+useragent <- "Your Name yourname@example.com"
 
 test_that("download_tickers downloads a clean copy.", {
     skip("Working")

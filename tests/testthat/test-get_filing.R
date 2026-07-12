@@ -1,4 +1,15 @@
-useragent <- "Joseph Bennett jbennett@jbennettconsulting.com"
+useragent <- "Your Name yourname@example.com"
+
+test_that("get_filing uses the cache version.", {
+    skip("Working")
+    test_cache <- "fixtures/testcache"
+    cik <- "1111111"
+    accession <- "0001111111-11-000011"
+    file_path <- get_filings(cik, accession, useragent, test_cache)
+    lines <- readLines(file_path)
+    result <- grepl("COMPANY CONFORMED NAME:\t\t\tTest", lines)
+    expect_true(any(result))
+})
 
 test_that("get_filing downloads a clean copy.", {
     skip("Working")
