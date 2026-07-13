@@ -12,3 +12,9 @@ test_that("extract_instance returns a path to an .xml file", {
 
     expect_true(all(files %in% list.files(path)))
 })
+
+test_that("extract_instance successfully extracts a zip file", {
+    sgml <- test_path("fixtures/sgml/1321655_10-K_2023-02-21_0001321655-23-000011.txt")
+    path <- extract_instance(sgml)
+    print(list.files(path, pattern=".*.zip"))
+})
