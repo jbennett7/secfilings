@@ -43,7 +43,7 @@ useragent <- "Your Name yourname@example.com"
 We will download the most recent filing of Google from EDGAR. (`slice(1)` works
 because `get_submissions` returns the rows in reverse-chronological order which
 is how EDGAR's JSON is ordered.)  EDGAR uses accession numbers to uniquely
-identify SGML documents. See `filing_urls` in `R/get_filings.R` for the
+identify SGML documents. See `filing_urls` in `R/get_filing.R` for the
 downloading URL. When extracting the data from the SGML file, multiple files are
 generated inside a temporary directory. Ensure that the directory is cleaned up
 before extracting multiple filings. `xbrlDoAll` will generate a list of data
@@ -53,12 +53,12 @@ information.
 ```{r download-extract-filing}
 cik <- get_cik('GOOG', useragent)
 
-# We use the accessionNumber to retrieve the file see `get_filings`
+# We use the accessionNumber to retrieve the file see `get_filing`
 accn <- get_submissions(cik, useragent) |>
     filter(grepl("^10-[KQ](?:\\/A)?$", form)) |>
     slice(1) |> pull(accessionNumber)
 
-sgml <- get_filings(cik, accn, useragent)
+sgml <- get_filing(cik, accn, useragent)
 
 # The file is extracted into multiple files placed in a temporary directory.
 outdir <- extract_instance(sgml)

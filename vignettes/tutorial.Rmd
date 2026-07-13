@@ -65,7 +65,7 @@ populate_database <- function(tickers, useragent, database = "./db") {
             dir.create(dir)
             message(paste0("Processing ", acc))
             # Download the sgml file from EDGAR
-            sgml <- get_filings(cik, acc, useragent)
+            sgml <- get_filing(cik, acc, useragent)
             # Extract the files from the sgml file.
             extract_instance(sgml, out_dir=dir)
             # Identify the XBRL instance file

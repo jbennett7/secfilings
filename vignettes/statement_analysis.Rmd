@@ -43,7 +43,7 @@ get_latest_xbrl <- function(ticker, useragent) {
         filter(grepl("^10-[KQ](?:\\/A)?$", form)) |>
         slice(1) |> pull(accessionNumber)
 
-    sgml <- secfilings::get_filings(cik, accn, useragent)
+    sgml <- secfilings::get_filing(cik, accn, useragent)
     outdir <- secfilings::extract_instance(sgml)
     
     inst <- list.files(outdir,

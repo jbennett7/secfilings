@@ -24,7 +24,7 @@ filing_urls <- function(cik, accession) {
 #' @importFrom httr RETRY user_agent stop_for_status content
 #' @return A data frame with columns: sequence, filename, type, description, size.
 #' @export
-get_filings <- function(cik, accession, useragent, cache = "./.cache") {
+get_filing <- function(cik, accession, useragent, cache = "./.cache") {
     # Generate the urls to retrieve the sgml files.
     urls <- filing_urls(cik, accession)
     # The path to store the SGML file.
