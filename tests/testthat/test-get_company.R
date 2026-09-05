@@ -1,6 +1,5 @@
 useragent <- "Your Name yourname@example.com"
 test_that("get_company uses the cache and not a new download.", {
-    skip("Working")
     cache_dir <- "fixtures/testcache"
     cik <- "1111111"
     expected <- "Test"
@@ -9,7 +8,6 @@ test_that("get_company uses the cache and not a new download.", {
 })
 
 test_that("get_company downloads a new sit if cache does not exist.", {
-    skip("Working")
     cache_dir <- "./testcache"
     cik <- "320193"
     expected <- "Apple Inc."

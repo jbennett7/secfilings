@@ -1,6 +1,5 @@
 useragent <- "Your Name yourname@example.com"
 test_that("get_submission uses the cache and not a new download.", {
-    skip("Working")
     cik <- "0001111111"
     test_cache <- "fixtures/testcache"
     # The line with this accession number was altered so it can be unique.
@@ -12,7 +11,6 @@ test_that("get_submission uses the cache and not a new download.", {
 })
 
 test_that("get_submissions downloads when not cached.", {
-    skip("Working")
     cik <- '0001321655'
     test_cache <- "./testcache"
     accession <- "0001823944-26-000007"

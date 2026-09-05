@@ -1,7 +1,6 @@
 useragent <- "Your Name yourname@example.com"
 
 test_that("download_submissions downloads a data frame with correct column names.", {
-    skip("Working")
     cache_dir <- "./testcache"
     cik <- '0001321655'
     expected <- '0001823952-26-000016'

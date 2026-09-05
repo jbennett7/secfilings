@@ -1,7 +1,6 @@
 useragent <- "Your Name yourname@example.com"
 
 test_that("download_tickers downloads a clean copy.", {
-    skip("Working")
     cache_dir <- "./testcache"
     csv_file <- paste0(cache_dir, "/tickers.csv")
     download_tickers(useragent, cache_dir)
