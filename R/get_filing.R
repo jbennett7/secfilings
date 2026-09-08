@@ -33,7 +33,7 @@ get_filing <- function(cik, accession, useragent, cache = "./.cache") {
         dir.create(unique(dirname(file_paths)), recursive=TRUE)
     for (i in seq_along(urls)) {
         if (!file.exists(file_paths[i])) {
-            message(paste0("Downloading filing: ", accession))
+            message(paste0("Downloading filing: ", accession[i]))
             response <- httr::RETRY("GET", urls[i], httr::user_agent(useragent),
                                     times = 5, pause_base = 1, pause_cap = 30)
             httr::stop_for_status(response)

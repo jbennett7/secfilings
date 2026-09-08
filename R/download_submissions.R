@@ -8,7 +8,7 @@
 #' @importFrom httr RETRY user_agent stop_for_status content
 #' @return data.frame containing the downloaded submissions.
 download_submissions <- function(cik, useragent, cache="./.cache") {
-    message("Downloading submissions: ", cik)
+    message("Downloading submissions: ", cik, "\n")
 
     # Target csv
     submissions <- paste0(cache, "/submissions/", cik, ".csv")

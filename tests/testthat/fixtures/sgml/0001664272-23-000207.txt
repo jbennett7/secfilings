@@ -1,0 +1,169 @@
+<SEC-DOCUMENT>0001664272-23-000207.txt : 20230309
+<SEC-HEADER>0001664272-23-000207.hdr.sgml : 20230309
+<ACCEPTANCE-DATETIME>20230309150944
+ACCESSION NUMBER:		0001664272-23-000207
+CONFORMED SUBMISSION TYPE:	4
+PUBLIC DOCUMENT COUNT:		1
+CONFORMED PERIOD OF REPORT:	20230308
+FILED AS OF DATE:		20230309
+DATE AS OF CHANGE:		20230309
+
+REPORTING-OWNER:	
+
+	OWNER DATA:	
+		COMPANY CONFORMED NAME:			Wilson Donta L
+		CENTRAL INDEX KEY:			0001681329
+
+	FILING VALUES:
+		FORM TYPE:		4
+		SEC ACT:		1934 Act
+		SEC FILE NUMBER:	001-10853
+		FILM NUMBER:		23719394
+
+	MAIL ADDRESS:	
+		STREET 1:		214 N TRYON STREET
+		CITY:			CHARLOTTE
+		STATE:			NC
+		ZIP:			28202
+
+ISSUER:		
+
+	COMPANY DATA:	
+		COMPANY CONFORMED NAME:			TRUIST FINANCIAL CORP
+		CENTRAL INDEX KEY:			0000092230
+		STANDARD INDUSTRIAL CLASSIFICATION:	NATIONAL COMMERCIAL BANKS [6021]
+		IRS NUMBER:				560939887
+		STATE OF INCORPORATION:			NC
+		FISCAL YEAR END:			1231
+
+	BUSINESS ADDRESS:	
+		STREET 1:		214 NORTH TRYON STREET
+		CITY:			CHARLOTTE
+		STATE:			NC
+		ZIP:			28202
+		BUSINESS PHONE:		3367332000
+
+	MAIL ADDRESS:	
+		STREET 1:		214 NORTH TRYON STREET
+		CITY:			CHARLOTTE
+		STATE:			NC
+		ZIP:			28202
+
+	FORMER COMPANY:	
+		FORMER CONFORMED NAME:	BB&T CORP
+		DATE OF NAME CHANGE:	19970527
+
+	FORMER COMPANY:	
+		FORMER CONFORMED NAME:	SOUTHERN NATIONAL CORP /NC/
+		DATE OF NAME CHANGE:	19920703
+</SEC-HEADER>
+<DOCUMENT>
+<TYPE>4
+<SEQUENCE>1
+<FILENAME>f4_a1e2k00000rxrbzuad-live.xml
+<DESCRIPTION>PRIMARY DOCUMENT
+<TEXT>
+<XML>
+<?xml version="1.0"?>
+<ownershipDocument>
+
+    <schemaVersion>X0306</schemaVersion>
+
+    <documentType>4</documentType>
+
+    <periodOfReport>2023-03-08</periodOfReport>
+
+    <notSubjectToSection16>false</notSubjectToSection16>
+
+    <issuer>
+        <issuerCik>0000092230</issuerCik>
+        <issuerName>TRUIST FINANCIAL CORP</issuerName>
+        <issuerTradingSymbol>TFC</issuerTradingSymbol>
+    </issuer>
+
+    <reportingOwner>
+        <reportingOwnerId>
+            <rptOwnerCik>0001681329</rptOwnerCik>
+            <rptOwnerName>Wilson Donta L</rptOwnerName>
+        </reportingOwnerId>
+        <reportingOwnerAddress>
+            <rptOwnerStreet1>214 N. TRYON STREET</rptOwnerStreet1>
+            <rptOwnerStreet2></rptOwnerStreet2>
+            <rptOwnerCity>CHARLOTTE</rptOwnerCity>
+            <rptOwnerState>NC</rptOwnerState>
+            <rptOwnerZipCode>28202</rptOwnerZipCode>
+            <rptOwnerStateDescription></rptOwnerStateDescription>
+        </reportingOwnerAddress>
+        <reportingOwnerRelationship>
+            <isDirector>false</isDirector>
+            <isOfficer>true</isOfficer>
+            <isTenPercentOwner>false</isTenPercentOwner>
+            <isOther>false</isOther>
+            <officerTitle>Sr. Executive Vice President</officerTitle>
+        </reportingOwnerRelationship>
+    </reportingOwner>
+
+    <nonDerivativeTable>
+        <nonDerivativeTransaction>
+            <securityTitle>
+                <value>Common Stock</value>
+            </securityTitle>
+            <transactionDate>
+                <value>2023-03-08</value>
+            </transactionDate>
+            <transactionCoding>
+                <transactionFormType>5</transactionFormType>
+                <transactionCode>G</transactionCode>
+                <equitySwapInvolved>false</equitySwapInvolved>
+            </transactionCoding>
+            <transactionAmounts>
+                <transactionShares>
+                    <value>114.0000</value>
+                </transactionShares>
+                <transactionPricePerShare>
+                    <value>0.0000</value>
+                </transactionPricePerShare>
+                <transactionAcquiredDisposedCode>
+                    <value>D</value>
+                </transactionAcquiredDisposedCode>
+            </transactionAmounts>
+            <postTransactionAmounts>
+                <sharesOwnedFollowingTransaction>
+                    <value>36666.0990</value>
+                </sharesOwnedFollowingTransaction>
+            </postTransactionAmounts>
+            <ownershipNature>
+                <directOrIndirectOwnership>
+                    <value>D</value>
+                </directOrIndirectOwnership>
+            </ownershipNature>
+        </nonDerivativeTransaction>
+        <nonDerivativeHolding>
+            <securityTitle>
+                <value>Common Stock</value>
+            </securityTitle>
+            <postTransactionAmounts>
+                <sharesOwnedFollowingTransaction>
+                    <value>5303.9820</value>
+                </sharesOwnedFollowingTransaction>
+            </postTransactionAmounts>
+            <ownershipNature>
+                <directOrIndirectOwnership>
+                    <value>I</value>
+                </directOrIndirectOwnership>
+                <natureOfOwnership>
+                    <value>By 401(k)</value>
+                </natureOfOwnership>
+            </ownershipNature>
+        </nonDerivativeHolding>
+    </nonDerivativeTable>
+
+    <ownerSignature>
+        <signatureName>Carla Brenwald, Attorney-in-fact</signatureName>
+        <signatureDate>2023-03-10</signatureDate>
+    </ownerSignature>
+</ownershipDocument>
+</XML>
+</TEXT>
+</DOCUMENT>
+</SEC-DOCUMENT>
