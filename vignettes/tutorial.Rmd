@@ -46,7 +46,7 @@ populate_database <- function(tickers, useragent, database = "./db") {
         # Lookup the cik of the ticker.
         cik <- get_cik(ticker, useragent)
         # get the company submission list. (Needed for the accession numbers.)
-        df  <- get_submissions(ticker, useragent)
+        df  <- get_submissions(cik, useragent)
         # Only download 10-Q and 10-K filings from these dates.
         filter <- df$form %in% c("10-Q", "10-K") &
                   df$reportDate > as.Date("2021-12-31") &

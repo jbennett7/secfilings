@@ -1,6 +1,6 @@
 Package: secfilings
 Title: Parse SEC Filings for data
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: 
     person("Joseph", "Bennett", , "jbennett@jbennettconsulting.com", role = c("aut", "cre"))
 Description: Parse SEC Filings using the edgar package and XBRL package.
@@ -11,7 +11,9 @@ Imports:
     httr,
     jsonlite,
     readr,
-    dplyr
+    dplyr,
+    xml2,
+    stringr
 Config/roxygen2/version: 8.0.0
 Suggests: 
     knitr,

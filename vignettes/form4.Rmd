@@ -28,8 +28,9 @@ following:
 devtools::load_all('.')
 suppressMessages({
     library(dplyr)
-    library(lubridate)
 })
+
+tmpdir <- tempdir()
 ```
 
 First we need to get the cik number for our symbol. Make sure to set the
@@ -37,7 +38,7 @@ useragent to your email address.
 
 ```{r get_cik}
 useragent <- "Useragent useragent@example.com"
-cik <- get_cik('TFC', useragent)
+cik <- get_cik('TFC', useragent, cache=tmpdir)
 ```
 
 Next we need to download all submissions associated with this cik and filter
@@ -47,14 +48,14 @@ vector is used to retrieve the filings from the SEC's EDGAR database. The final
 output of this process is `filings`, which is a vector of paths to the
 downloaded SGML files.
 
-```{r get_submissions}
-submissions <- get_submissions(cik, useragent)
+```{r get_submissions, message=FALSE}
+submissions <- get_submissions(cik, useragent, cache=tmpdir)
 accessions <- submissions |>
     filter(
         form == "4",
         reportDate < "2026-09-08" & reportDate > "2025-09-08") |>
     pull(accessionNumber)
-filings <- get_filing(cik, accessions, useragent)
+filings <- get_filing(cik, accessions, useragent, cache=tmpdir)
 ```
 
 We iterate over each file in `filings`, using the base package's `Filter`,
@@ -230,6 +231,22 @@ instances in this table will represent vested items or stock options.
 deriv_transactions |> print(n = 5)
 
 deriv_holdings |> print(n = 5)
+```
+
+## Footnotes table
+
+The footnotes table holds the footnotes that are associated with the
+transactions. These are generally associated with the nonderivative
+transactions only.
+
+| variable | description |
+|---:|:---|
+| `accession` | The filing `accessionNumber` used to uniquely identify each filing. |
+| `footnoteId` | The footnote id used to associate with the transaction. |
+| `text` | The actual footnote text. |
+
+```{r footnotes}
+footnotes_all |> print(n = 5)
 ```
 
 # An insider trading transaction history table
