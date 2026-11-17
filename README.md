@@ -1,133 +1,117 @@
 # secfilings
 
-An R package that will manage downloaded SGML EDGAR filings.
+Retrieve and Parse SEC EDGAR Filings.
 
-Personal research tool — not intended for CRAN publication.
+secfilings looks up company identifiers, filing histories and filing documents
+from the SEC EDGAR system, caching everything locally to limit requests. It
+extracts the documents bundled in a filing (including XBRL instance files and
+uuencoded attachements) and parses Form 4 insider transactions and Schedule 13G
+beneficial ownership reports.
 
-## Overview
+It does not parse XBRL itself: hand the extracted instance file to
+[XBRL](https://github.com/jbennett7/XBRL), or build full financial statements
+with [xbrlstatements](https://github.com/jbennett7/xbrlstatements).
 
-SEC EDGAR filings contain structured financial data in XBRL format, but
-extracting it requires navigating SGML containers, two different XBRL
-submission formats (traditional and inline), and SEC's filing index APIs. This
-package handles all of that so you can go from a company CIK to a parsed set of
-financial facts in one function call.
-
-```r
-library(secfilings)
-# from https://github.com/jbennett7/XBRL
-library(XBRL)
-
-UA <- "Your Name your@email.com"
-
-# Retrieve Apple's Filing 
-sgml <- get_filings("320193", "0000320193-26-000013", UA)
-dir.create("./sgml_extracted")
-extract_instance(sgml, out_dir="./sgml_extracted")
-inst <- list.files("./sgml_extracted", pattern="_htm.xml", full.names=TRUE)
-dir.create("./db/320193")
-
-xbrl <- xbrlDoAll(inst, prefix.out="./db/320193/0000320193-26-000013_")
-
-# Access the parsed data frames
-xbrl$fact      # financial facts (values)
-xbrl$context   # time periods and entity identifiers
-xbrl$label     # human-readable concept names
-xbrl$element   # element metadata (periodType, balance, etc.)
-```
+Personal research tool - not intended for CRAN publication.
 
 ## Installation
 
 ```r
-# XBRL is installed from GitHub
-devtools::install_github("jbennett7/XBRL")
-
-# Install this package from GitHub
 devtools::install_github("jbennett7/secfilings")
 ```
 
-For development (with live reload):
+## Quick start
 
 ```r
-devtools::load_all(".")
+library(secfilings)
+library(dplyr)
+
+ua <- "Your Name your@email.com"   # SEC requires a name and email
+
+cik <- get_cik("T", ua)            # "0000732717"
+get_company(cik, ua)               # "AT&T INC."
+
+# Every filing the company has made, newest first
+filings <- get_submissions(cik, ua) |>
+    filter(form == "10-Q", isXBRL) |>
+    arrange(desc(reportDate))
+
+# Download the latest 10-Q and unpack its documents
+sgml <- get_filing(cik, filings$accessionNumber[1], ua)
+dir  <- extract_instance(sgml, out_dir = file.path(tempdir(), "t-10q"))
+
+# The XBRL instance: inline (_htm.xml) or traditional (YYYYMMDD.xml)
+inst <- list.files(dir, pattern = "(?:\\d{8}|_htm)\\.xml$", full.names = TRUE)
+xbrl <_ XBRL::xbrlDoAll(inst)
 ```
 
-## Usage
-
-### `get_filings(cik, accessionNumber, useragent)` 
-
-Downloads the sgml filing.
-
-### `extract_instance(sgml_path, out_dir)`
-
-Parses an SGML submission `.txt` file, extracts the embedded XBRL instance
-document, writes it to `out_dir`, and returns the path.
+### Insider transactions
 
 ```r
-xml_path <- extract_instance("/path/to/filing.txt")
+form4s <- get_submissions(cik, ua) |> filter(form == "4")
+paths  <- get_filing(cik, form4s$accessionNumber, ua)
+parsed <- lapply(paths, parse_4)          # NULL (with a warning) for unparseable filings
+
+transactions <- bind_rows(lapply(parsed, `[[`, "nonderiv_transactions"))
 ```
 
-### `get_cik(ticker, useragent)`
+## Functions
 
-Returns the cik for the company represented by the ticker symbol.
+| Function | Returns |
+|---|---|
+| `get_cik(ticker, useragent, cache)` | 10-digit CIK string, or `NA` if the ticker is unknown |
+| `get_company(cik, useragent, cache)` | Company name, or `NA` if the CIK is unknown |
+| `get_submissions(cik, useragent, cache)` | Tibble with one row per filing, all pages included |
+| `get_filing(cik, accession, useragent, cache)` | Path(s) to the downloaded SGML `.txt`; vectorized over `accession` |
+| `extract_instance(sgml_path, out_dir)` | `out_dir`, after writing every document in the filing to o it (uuencoded attachements are decoded, zips unzipped) |
+| `parse_4(filename)` | List of 7 tibbles (`filing`, `owners`, `nonderiv_transactions`, `nonderiv_holdings`, `deriv_transactions`, `deriv_holdings`, `footnotes`), or `NULL` with a warning for non-Form-4 or pre-2003 filings |
+| `parse_13g(filename)` | One-row tibble for a Schedule 13G or 13G/A |
 
-## XBRL Data Model
+`get_submissions` returns typed columns: `filingDate` and `reportDate` are
+Dates, `acceptanceDateTime` is POSIXct, `isXBRL` / `isInlineXBRL` /
+`isXBRLNumeric` are logical, and identifiers (`filmNumber`, `fileNumber`,
+`items`) are character.
 
-| DataFrame      | Key columns                                                           |
-|----------------|-----------------------------------------------------------------------|
-| `$fact`        | elementId, contextId, unitId, fact (value), decimals, factId, ns     |
-| `$context`     | contextId, scheme, identifier, startDate, endDate, instant           |
-| `$dimension`   | contextId, dimension, value                                           |
-| `$element`     | elementId, periodType, balance, abstract, nillable                   |
-| `$label`       | elementId, lang, labelRole, labelString                              |
-| `$unit`        | unitId, measure, unitNumerator, unitDenominator                      |
+## Caching
 
-Key joins:
+Every download is cached under `cache` (default `./.cache`) and reused on later calls:
 
-- `fact$contextId → context$contextId` — adds entity + period to each fact
-- `fact$elementId → label$elementId` — adds human-readable concept names
-
-Contexts come in two flavors: **instant** (balance sheet date, use `context$instant`) and **duration** (income statement period, use `context$startDate`/`endDate`).
-
-## Working with Facts
-
-```r
-# Pull a single fact by concept and period end date
-get_fact <- function(xbrl, concept, period_end) {
-  facts <- xbrl$fact
-  ctx   <- xbrl$context
-  dims  <- unique(xbrl$dimension$contextId)
-
-  ctx_match <- ctx[
-    !ctx$contextId %in% dims &
-    ((!is.na(ctx$endDate) & ctx$endDate == period_end) |
-     (!is.na(ctx$instant) & ctx$instant == period_end)),
-  ]
-
-  f <- facts[facts$elementId == concept & facts$contextId %in% ctx_match$contextId, ]
-  if (nrow(f) == 0) return(NA_real_)
-  as.numeric(f$fact[1])
-}
-
-# Apple FY2023 revenue
-get_fact(xbrl,
-  "us-gaap_RevenueFromContractWithCustomerExcludingAssessedTax",
-  "2023-09-30"
-)
-# [1] 383285000000
 ```
+.cache/
+|--tickers.csv                      # get_cik, get_company
+|--submissions/<cik>.csv            # get_submissions
+|--filings/<cik>/<accession>.txt    # get_filing
+```
+
+Delete a file to force a fresh download. The ticker list and submissions change
+over time; filings never do.
 
 ## Notes
 
-- `useragent` must be in the form `"Name email@domain.com"` as required by the SEC. The `edgar` package silently rejects certain email addresses.
-- `edgar` rate-limits to 3 seconds between SEC requests per fair-access policy. Bulk downloads are intentionally slow.
-- Kohl's and some other filers (DFIN ActiveDisclosure format) embed all linkbases inside the `.xsd` — separate `_lab.xml`, `_pre.xml`, `_cal.xml`, `_def.xml` files do not exist. The package handles this automatically.
-- Kohl's fiscal year ends in early February (FY2023 ended 2024-02-03); use `year = 2024`.
-- Amazon FY2023 10-K was filed in February 2024; use `year = 2024`.
+- **User agent.** SEC requires every request to identify you as
+  `"Name email@domain.com"`; generic or missing user agents get HTTP 403.
+- **Rate limits.** SEC allows about 10 requests per second. Requests are
+  retried with backoff on failure, but bulk downloads (e.g. every Form 4 for a
+  large company) should be paced.
+- **Ticker format.** SEC uses dashes for share classes (`BRK-B`), not dots.
+- **Form 4 amendments** (`4/A`) are currently rejected by `parse_4`.
+
+## Development
+
+```r
+devtools::test()
+devtools::check()
+```
+
+Tests that hit SEC are skipped unless `SEC_USERAGENT` is set (add it to
+`~/.Renviron`). Everything else runs offline against fixtures in
+`tests/testthat/fixtures/`, with HTTP responses mocked from `fixtures/http/`.
 
 ## Dependencies
 
-- [`XBRL`](https://github.com/jbennett7/XBRL) - XBRL/iXBRL instance document parser. This package is not explicitly dependent on this package. However, in order to parse the XBRL document this is needed.
-- [`httr`](https://cran.r-project.org/package=httr) - HTTP requests.
-- [`jsonlite`](https://cran.r-project.org/package=jsonlite) - JSON parsing.
-- [`readr`](https://cran.r-project.org/package=readr) - provide fast and friendly way to read and write rectangular data (csv, tsv, etc...).
-- [`dplyr`](https://cran.r-project.org/package=dplyr) - Data frame tools.
+- [`httr`](https://cran.r-project.org/package=httr) - HTTP requests with retry
+- [`readr`](https://cran.r-project.org/package=readr) - CSV cache
+- [`dplyr`](https://cran.r-project.org/package=dplyr),
+  [`tibble`](https://cran.r-project.org/package=tibble): data frames
+- [`xml2`](https://cran.r-project.org/package=xml2): Form 4 / 13G parsing
+
