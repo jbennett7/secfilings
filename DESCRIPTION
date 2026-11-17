@@ -7,7 +7,7 @@ Description: Looks up company identifiers, filing histories and filing
     documents from the SEC EDGAR system, with a local cache to limit requests.
     Extracts the documents bundled in a filing, including XBRL instance files
     and uuencoded attachements, and parses Form 4 insider transactions and
-    Schedule 153G beneifical ownership reports.
+    Schedule 13G beneifical ownership reports.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
