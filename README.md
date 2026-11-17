@@ -5,7 +5,7 @@ Retrieve and Parse SEC EDGAR Filings.
 secfilings looks up company identifiers, filing histories and filing documents
 from the SEC EDGAR system, caching everything locally to limit requests. It
 extracts the documents bundled in a filing (including XBRL instance files and
-uuencoded attachements) and parses Form 4 insider transactions and Schedule 13G
+uuencoded attachments) and parses Form 4 insider transactions and Schedule 13G
 beneficial ownership reports.
 
 It does not parse XBRL itself: hand the extracted instance file to
@@ -42,7 +42,7 @@ dir  <- extract_instance(sgml, out_dir = file.path(tempdir(), "t-10q"))
 
 # The XBRL instance: inline (_htm.xml) or traditional (YYYYMMDD.xml)
 inst <- list.files(dir, pattern = "(?:\\d{8}|_htm)\\.xml$", full.names = TRUE)
-xbrl <_ XBRL::xbrlDoAll(inst)
+xbrl <- XBRL::xbrlDoAll(inst)
 ```
 
 ### Insider transactions
@@ -63,7 +63,7 @@ transactions <- bind_rows(lapply(parsed, `[[`, "nonderiv_transactions"))
 | `get_company(cik, useragent, cache)` | Company name, or `NA` if the CIK is unknown |
 | `get_submissions(cik, useragent, cache)` | Tibble with one row per filing, all pages included |
 | `get_filing(cik, accession, useragent, cache)` | Path(s) to the downloaded SGML `.txt`; vectorized over `accession` |
-| `extract_instance(sgml_path, out_dir)` | `out_dir`, after writing every document in the filing to o it (uuencoded attachements are decoded, zips unzipped) |
+| `extract_instance(sgml_path, out_dir)` | `out_dir`, after writing every document in the filing to o it (uuencoded attachments are decoded, zips unzipped) |
 | `parse_4(filename)` | List of 7 tibbles (`filing`, `owners`, `nonderiv_transactions`, `nonderiv_holdings`, `deriv_transactions`, `deriv_holdings`, `footnotes`), or `NULL` with a warning for non-Form-4 or pre-2003 filings |
 | `parse_13g(filename)` | One-row tibble for a Schedule 13G or 13G/A |
 
@@ -112,6 +112,7 @@ Tests that hit SEC are skipped unless `SEC_USERAGENT` is set (add it to
 - [`httr`](https://cran.r-project.org/package=httr) - HTTP requests with retry
 - [`readr`](https://cran.r-project.org/package=readr) - CSV cache
 - [`dplyr`](https://cran.r-project.org/package=dplyr),
-  [`tibble`](https://cran.r-project.org/package=tibble): data frames
-- [`xml2`](https://cran.r-project.org/package=xml2): Form 4 / 13G parsing
+  [`tibble`](https://cran.r-project.org/package=tibble) - data frames
+- [`xml2`](https://cran.r-project.org/package=xml2) - Form 4 / 13G parsing
+- [`stringr`](https://cran.r-project.org/package=stringr) - Form 4 / 13G parsing
 
