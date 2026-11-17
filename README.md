@@ -1,6 +1,6 @@
 # secfilings
 
-Retrieve and Parse SEC EDGAR Filings.
+Retrieve and parse SEC EDGAR filings.
 
 secfilings looks up company identifiers, filing histories and filing documents
 from the SEC EDGAR system, caching everything locally to limit requests. It
@@ -63,7 +63,7 @@ transactions <- bind_rows(lapply(parsed, `[[`, "nonderiv_transactions"))
 | `get_company(cik, useragent, cache)` | Company name, or `NA` if the CIK is unknown |
 | `get_submissions(cik, useragent, cache)` | Tibble with one row per filing, all pages included |
 | `get_filing(cik, accession, useragent, cache)` | Path(s) to the downloaded SGML `.txt`; vectorized over `accession` |
-| `extract_instance(sgml_path, out_dir)` | `out_dir`, after writing every document in the filing to o it (uuencoded attachments are decoded, zips unzipped) |
+| `extract_instance(sgml_path, out_dir)` | `out_dir`, after writing every document in the filing to it (uuencoded attachments are decoded, zips unzipped) |
 | `parse_4(filename)` | List of 7 tibbles (`filing`, `owners`, `nonderiv_transactions`, `nonderiv_holdings`, `deriv_transactions`, `deriv_holdings`, `footnotes`), or `NULL` with a warning for non-Form-4 or pre-2003 filings |
 | `parse_13g(filename)` | One-row tibble for a Schedule 13G or 13G/A |
 
