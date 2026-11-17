@@ -9,28 +9,40 @@ to_lgl <- function(x) {
 
 #' Parse a Form 4 (insider transaction) filing
 #'
-#' Pases one Form 4 SGML `.txt` file, as returned by
+#' Parses one Form 4 SGML `.txt` file, as returned by
 #' `secfilings::get_filing()`, into a list of 7 tibbles joined by `accession`:
 #' `filing`, `owners`, `nonderiv_transactions`, `nonderiv_holdings`,
 #' `deriv_transactions`, `deriv_holdings`, and `footnotes`. The split reflects
 #' that a single filing can report multiple owners, transactions, and holdings,
 #' each with different applicable fields.
 #'
-#' Rejects two cases by warning and returning `NULL` rather than attempting to
-#' parse: pre-2003 filings, which predate SEC's electronic-XML mandate, and
-#' non-Form-4 documents whose SGML happens to contain an `<XML>` block but fail
-#' validation agains `ownershipDocument` / `documentType == "4"`.
+#' Rejects three cases by warning and returning `NULL` rather than attempting
+#' to parse: submissions whose SGML header type isn't `4` (including `4/A`
+#' amendments), pre-2003 Form 4s that predate SEC's electronic-XML mandate,
+#' and, as a backstop, a Form 4 whose `<XML>` block isn't an
+#' `ownershipDocument`.
 #' 
-#' Returns raw, per-node extraction only - it does not deduplicate transactions/holdings sharing an ownership bucket, aggregate beneficial beneficial ownership across buckets, or resolve owners to specific transactions on a joint filing. Empty tables (e.g. `deriv_transactions` for a filing with no derivative activity) still return the correct zero-row schema.
+#' Returns raw, per-node extraction only - it does not deduplicate
+#' transactions/holdings sharing an ownership bucket, aggregate beneficial
+#' ownership across buckets, or resolve owners to specific transactions on a
+#' joint filing. Empty tables (e.g. `deriv_transactions` for a filing with no
+#' derivative activity) still return the correct zero-row schema.
 #'
 #' @param filename Path to a cached Form 4 `.txt` file.
 #' @return A named list of 7 tibbles, or `NULL` if `filename` isn't a parseable
+#'   Form 4.
 #' @export
 parse_4 <- function(filename) {
     raw <- readr::read_file(filename)
 
     accession <- tools::file_path_sans_ext(basename(filename))
     filed_date <- stringr::str_match(raw, "FILED AS OF DATE:\\s+(\\d{8})")[, 2]
+    submission_type <- stringr::str_match(raw, "CONFORMED SUBMISSION TYPE:\\s+(\\S+)")[, 2]
+    if (is.na(submission_type) || submission_type != "4") {
+        warning(paste0(accession, ": not a Form 4 (submission type ",
+                       submission_type, ") - skipping"))
+        return(NULL)
+    }
 
     xml_content <- raw |>
         stringr::str_match(stringr::regex("<XML>\\r?\\n(.*?)\\n</XML>", dotall = TRUE))
@@ -49,19 +61,17 @@ parse_4 <- function(filename) {
         xml2::xml_text(xml2::xml_find_first(node, xpath), trim = TRUE)
     }
 
-    # An <XML> block alone isn't proof this is a Form 4 - e.g. an 8-K's mandatory
-    # cover-page XBRL (dei:DocumentType, different case from Form 4's own
-    # documentType) also matches the regex above but isn't an ownershipDocument.
-    if (xml2::xml_name(doc) != "ownershipDocument" || is.na(txt(doc, ".//documentType")) ||
-            txt(doc, ".//documentType") != "4") {
-        warning(paste0(accession, ": not a Form 4 ownershipDocument - skipping"))
+    # Backstop: the header says Form 4, but confirm the XML block really is the
+    # ownership document before parsing it (otherwise every field comes back NA).
+    if (xml2::xml_name(doc) != "ownershipDocument") {
+        warning(paste0(accession, ": <XML> block is not an ownershipDocument - skipping"))
         return(NULL)
     }
 
-    # All footnoteId refs anywhere within a line item, comma-joined.
+    # Distinct footnoteId refs anywhere within a line item, comma-joined in first seen order.
     footnote_ids <- function(node) {
         ids <- xml2::xml_attr(xml2::xml_find_all(node, ".//footnoteId"), "id")
-        if (length(ids) == 0) NA_character_ else paste(ids, collapse = ",")
+        if (length(ids) == 0) NA_character_ else paste(unique(ids), collapse = ",")
     }
 
     filing <- tibble::tibble(

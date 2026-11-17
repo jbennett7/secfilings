@@ -4,9 +4,7 @@
 #' @param useragent, Character. Required by SEC: "Name email@domain.com"
 #' @param cache, Character. Temporary cache for storing the tickers as a
 #'   csv file.
-#' @importFrom tibble as.tibble
-#' @importFrom httr RETRY user_agent stop_for_status content
-#' @return data.frame containing the downloaded submissions.
+#' @return A tibble with one row per filing
 download_submissions <- function(cik, useragent, cache="./.cache") {
     message("Downloading submissions: ", cik, "\n")
 
@@ -21,32 +19,25 @@ download_submissions <- function(cik, useragent, cache="./.cache") {
     url <- paste0("https://data.sec.gov/submissions/CIK", cik, ".json")
 
     # Download the submission JSON.
-    response <- httr::RETRY("GET", url, httr::user_agent(useragent),
-                             times = 5, pause_base = 1, pause_cap = 30)
-    httr::stop_for_status(response)
-    content <- httr::content(response)
+    content <- sec_get(url, useragent)
     df <- data.frame(lapply(content$filings$recent, function(x) {
         vapply(x, function(el)
             if (is.null(el)) NA_character_
             else as.character(el[[1]]), character(1))
     }))
-    extras <- bind_rows(content$filings$files)
+    extras <- dplyr::bind_rows(content$filings$files)
     suppressWarnings({for (file in extras$name) {
         url <- paste0("https://data.sec.gov/submissions/", file)
-        response <- httr::RETRY("GET", url, httr::user_agent(useragent),
-                                times = 5, pause_cap = 30)
-        httr::stop_for_status(response)
-        content <- httr::content(response)
+        content <- sec_get(url, useragent)
         temp <- data.frame(lapply(content,
                          function(x) {
             vapply(x, function(el)
                 if (is.null(el)) NA_character_
                 else as.character(el[[1]]), character(1))
         }))
-        df <- bind_rows(df, temp)
+        df <- dplyr::bind_rows(df, temp)
     }})
     
-    # Save to file and return data.frame.
     readr::write_csv(df, submissions, na = "")
-    return(tibble::as_tibble(df))
+    return(read_submissions(submissions))
 }

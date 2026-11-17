@@ -2,10 +2,6 @@
 #' range of files to build a data frame.
 #' 
 #' @param filename SGML filename to parse
-#' @importFrom tibble tibble
-#' @importFrom xml2 xml_text xml_find_all xml_ns_strip read_xml xml_find_first
-#' @importFrom stringr str_match regex
-#' @importFrom readr read_file
 #' @return tibble row
 #' @export
 parse_13g <- function(filename) {

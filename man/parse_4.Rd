@@ -11,9 +11,10 @@ parse_4(filename)
 }
 \value{
 A named list of 7 tibbles, or \code{NULL} if \code{filename} isn't a parseable
+Form 4.
 }
 \description{
-Pases one Form 4 SGML \code{.txt} file, as returned by
+Parses one Form 4 SGML \code{.txt} file, as returned by
 \code{secfilings::get_filing()}, into a list of 7 tibbles joined by \code{accession}:
 \code{filing}, \code{owners}, \code{nonderiv_transactions}, \code{nonderiv_holdings},
 \code{deriv_transactions}, \code{deriv_holdings}, and \code{footnotes}. The split reflects
@@ -21,10 +22,15 @@ that a single filing can report multiple owners, transactions, and holdings,
 each with different applicable fields.
 }
 \details{
-Rejects two cases by warning and returning \code{NULL} rather than attempting to
-parse: pre-2003 filings, which predate SEC's electronic-XML mandate, and
-non-Form-4 documents whose SGML happens to contain an \verb{<XML>} block but fail
-validation agains \code{ownershipDocument} / \code{documentType == "4"}.
+Rejects three cases by warning and returning \code{NULL} rather than attempting
+to parse: submissions whose SGML header type isn't \code{4} (including \code{4/A}
+amendments), pre-2003 Form 4s that predate SEC's electronic-XML mandate,
+and, as a backstop, a Form 4 whose \verb{<XML>} block isn't an
+\code{ownershipDocument}.
 
-Returns raw, per-node extraction only - it does not deduplicate transactions/holdings sharing an ownership bucket, aggregate beneficial beneficial ownership across buckets, or resolve owners to specific transactions on a joint filing. Empty tables (e.g. \code{deriv_transactions} for a filing with no derivative activity) still return the correct zero-row schema.
+Returns raw, per-node extraction only - it does not deduplicate
+transactions/holdings sharing an ownership bucket, aggregate beneficial
+ownership across buckets, or resolve owners to specific transactions on a
+joint filing. Empty tables (e.g. \code{deriv_transactions} for a filing with no
+derivative activity) still return the correct zero-row schema.
 }

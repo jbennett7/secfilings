@@ -1,12 +1,19 @@
+#' Retrieve Company Information
+#'
+#' @param cik Character. The company CIK (with or without leading zeros).
+#' @param useragent, Character. Required by SEC: "Name email@domain.com".
+#' @param cache, Character. Temporary cache for storing the tickers as a
+#' @return Company Information
 #' @export
 get_company <- function(cik, useragent, cache="./.cache") {
-    df <- tryCatch({
-        readr::read_csv(paste0(cache, "/tickers.csv"), na = "")
-    }, error = function(e) {
+    tickers <- file.path(cache, "tickers.csv")
+    df <- if (file.exists(tickers)) {
+        readr::read_csv(tickers, na = "", show_col_types = FALSE)
+    } else {
         download_tickers(useragent, cache)
-    })
+    }
     cik <- sub("^0+", "", cik)
     entry <- df[df$cik_str == cik,]$title
     if (length(entry) == 0) return(NA_character_)
-    return(entry)
+    entry[1]
 }

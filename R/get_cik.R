@@ -4,18 +4,15 @@
 #' @param useragent, Character. Required by SEC: "Name email@domain.com"
 #' @param cache, Character. Temporary cache for storing the tickers as a
 #'   csv file.
-#' @importFrom readr read_csv
 #' @return 10 character cik string.
 #' @export
 get_cik <- function(ticker, useragent, cache="./.cache") {
-    # Try to read the tickers csv file, generate it if it doens't exist.
-    df <- tryCatch({
-        suppressMessages(
-            readr::read_csv(paste0(cache, "/tickers.csv"), na = "")
-        )
-    }, error = function(e) {
+    tickers <- file.path(cache, "tickers.csv")
+    df <- if (file.exists(tickers)) {
+        readr::read_csv(tickers, na = "", show_col_types = FALSE)
+    } else {
         download_tickers(useragent, cache)
-    })
+    }
     # Convert ticker symbol to all UPPER case characters.
     ticker <- toupper(ticker)
     # If the entry isn't in the data frame, return NA.

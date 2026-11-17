@@ -47,18 +47,10 @@ test_that("parse_4 parses a form 4 filing file correctly", {
     expect_equal(h$natureOfOwnership, "By 401(k)")
     expect_equal(h$sharesOwnedFollowing, 5303.982)
 
-    # no derivatives, no footnores on this filing - confirm empty tibbles
-    # not NULL or missing columns
+    # no derivatives, no footnotes on this filing
     expect_equal(nrow(result$deriv_transactions), 0)
     expect_equal(nrow(result$deriv_holdings), 0)
     expect_equal(nrow(result$footnotes), 0)
-    expect_named(result$deriv_transactions,
-        c("accession", "securityTitle", "conversionOrExercisePrice",
-          "transactionDate", "deemedExecutionDate", "transactionCode",
-          "shares", "pricePerShare", "acquiredDisposedCode", "exerciseDate",
-          "expirationDate", "underlyingSecurityTitle",
-          "underlyingSecurityShares", "sharesOwnedFollowing", "ownershipType",
-          "natureOfOwnership", "footnoteIds"))
 })
 
 test_that("parse_4 will return a warning and NULL for pre-2003 filings", {
@@ -70,7 +62,7 @@ test_that("parse_4 will return a warning and NULL for pre-2003 filings", {
 test_that("parse_4 regression for real <TYPE>8-K in the same CIK cache dir", {
     filing <- test_path("fixtures/sgml/0000092230-22-000040.txt")
     results <- expect_warning(
-        parse_4(filing), regexp="not a Form 4 ownershipDocument")
+        parse_4(filing), regexp="not a Form 4")
     expect_null(results)
 })
 
@@ -154,3 +146,41 @@ test_that("parse_4 preserves every same-day transaction row without mergin", {
     expect_equal(tx$sharesOwnedFollowing, c(8907, 6601, 6291, 5516))
 })
 
+test_that("parse_4 rejects a pre-XBRL 8-K as not a Form 4, not as pre-2003", {
+    filing <- test_path("fixtures", "sgml", "0000092230-04-000082.txt")
+    expect_warning(result <- parse_4(filing), "not a Form 4")
+    expect_null(result)
+})
+
+test_that("parse_4 extracts footnote ids and text", {
+    filing <- test_path("fixtures", "sgml", "0001182002-26-000006.txt")
+    result <- parse_4(filing)
+    expect_equal(result$footnotes$footnoteId, c("F1", "F2", "F3", "F4", "F5"))
+    expect_equal(unique(result$footnotes$accession), "0001182002-26-000006")
+    f1 <- result$footnotes$text[result$footnotes$footnoteId == "F1"]
+    expect_match(f1, '"GRAT"', fixed = TRUE)
+    expect_no_match(f1, "&quot;", fixed = TRUE)
+})
+
+test_that("parse_4 footnoteIds reference existing footnotes, deduplicated", {
+    filing <- test_path("fixtures", "sgml", "0001182002-26-000006.txt")
+    result <- parse_4(filing)
+    expect_equal(result$deriv_holdings$footnoteIds, c("F3,F2", "F4", "F5"))
+    refs <- c(result$nonderiv_transactions$footnoteIds, result$nonderiv_holdings$footnoteIds,
+              result$deriv_transactions$footnoteIds,    result$deriv_holdings$footnoteIds)
+    refs <- unlist(strsplit(refs[!is.na(refs)], ","))
+    expect_in(refs, result$footnotes$footnoteId)
+
+    expect_equal(result$nonderiv_transactions$footnoteIds, "F1")
+    expect_equal(result$nonderiv_holdings$footnoteIds, c("F1", "F2", NA))
+})
+
+test_that("parse_4 returns zero-row transaction tables that match the populated schema", {
+    result  <- parse_4(test_path("fixtures", "sgml", "0001182002-25-000005.txt"))
+    with_nd <- parse_4(test_path("fixtures", "sgml", "0001664272-23-000207.txt"))
+    with_d  <- parse_4(test_path("fixtures", "sgml", "0001198477-26-000002.txt"))
+    expect_identical(result$nonderiv_transactions, with_nd$nonderiv_transactions[0, ])
+    expect_identical(result$deriv_transactions,    with_d$deriv_transactions[0, ])
+    expect_equal(nrow(result$nonderiv_holdings), 5)
+    expect_equal(nrow(result$deriv_holdings), 2)
+})

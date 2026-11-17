@@ -63,12 +63,19 @@ extract_instance <- function(sgml_path, out_dir = tempdir()) {
       text_end   <- which(block == "</TEXT>")-1
 
       # Binary documents (ZIP, GRAPHIC, ...) are uuencoded: "begin <mode>
-      # <name>" wraps the body and "end" trails it. Everything else may
-      # have an <XBRL>/<XML> wrapper line to skip instead.
+      # <name>" wraps the body and "end" trails it, but may not be the last
+      # line before </TEXT>. Everything else may have an <XBRL>/<XML> wrapper
+      # line to skip instead.
       is_uuencoded <- grepl("^begin [0-7]+ ", block[text_start])
       if (is_uuencoded || grepl("^<(?:XBRL|XML)>", block[text_start])) {
-          text_start <- text_start+1
-          text_end   <- text_end-1
+          text_start <- text_start + 1
+          if (is_uuencoded) {
+              # Stop before the "end" trailer; a blank line may sit between it and </TEXT>.
+              end_line <- which(block == "end")
+              text_end <- end_line[end_line > text_start][1] - 1
+          } else {
+              text_end <- text_end - 1
+          }
       }
       # The content is between these two.
       content <- block[(text_start):(text_end)]

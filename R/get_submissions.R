@@ -1,34 +1,42 @@
 #' Retrieve the company EDGAR submissions.
 #'
-#' @param ticker, Character. Ticker symbol of the company.
+#' @param cik, Character. The company CIK.
 #' @param useragent, Character. Required by SEC: "Name email@domain.com"
 #' @param cache, Character. Temporary cache for storing the tickers as a
 #'   csv file.
-#' @importFrom readr write_csv read_csv cols col_character
-#' @importFrom dplyr mutate
-#' @return data.frame, Character. The submission list in data frame format.
+#' @return A tibble with one row per filing
 #' @export
 get_submissions <- function(cik, useragent, cache = "./.cache") {
-    if (is.na(cik)) stop("Could not get cik for ticker.")
+    if (is.na(cik)) stop("cik is NA (ticker lookup failed?)")
     submissions <- paste0(cache, "/submissions/", cik, ".csv")
     if (!file.exists(submissions)) {
         return(download_submissions(cik, useragent, cache))
     } else {
-        suppressMessages(read_csv(submissions,
-                        na = "",
-                        show_col_types=FALSE,
-                        # act = "NE" is a legitimate SEC data,
-                        #   but read_csv guesses act as numeric.
-                        col_types = readr::cols(act = readr::col_character())) |>
-        mutate(filingDate = as.Date(filingDate)))
+        read_submissions(submissions)
     }
 }
 
-# Submission data frame variables
-# [1] "accessionNumber"       "filingDate"            "reportDate"
-# [4] "acceptanceDateTime"    "act"                   "form"
-# [7] "fileNumber"            "filmNumber"            "items"
-#[10] "core_type"             "size"                  "isXBRL"
-#[13] "isInlineXBRL"          "isXBRLNumeric"         "primaryDocument"
-#[16] "primaryDocDescription"
-
+read_submissions <- function(filepath) {
+    tibble::as_tibble(readr::read_csv(filepath,
+        na = "",
+        show_col_types=FALSE,
+        col_types = readr::cols(
+            accessionNumber = readr::col_character(),
+            act = readr::col_character(),
+            form = readr::col_character(),
+            fileNumber = readr::col_character(),
+            filmNumber = readr::col_character(),
+            items = readr::col_character(),
+            core_type = readr::col_character(),
+            primaryDocument = readr::col_character(),
+            primaryDocDescription = readr::col_character(),
+            filingDate = readr::col_date(),
+            reportDate = readr::col_date(),
+            acceptanceDateTime = readr::col_datetime(),
+            size = readr::col_double(),
+            isXBRL = readr::col_logical(),
+            isInlineXBRL = readr::col_logical(),
+            isXBRLNumeric = readr::col_logical()
+        )
+    ))
+}

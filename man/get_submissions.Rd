@@ -7,12 +7,12 @@
 get_submissions(cik, useragent, cache = "./.cache")
 }
 \arguments{
+\item{cik, }{Character. The company CIK.}
+
 \item{useragent, }{Character. Required by SEC: "Name email@domain.com"}
 
 \item{cache, }{Character. Temporary cache for storing the tickers as a
 csv file.}
-
-\item{ticker, }{Character. Ticker symbol of the company.}
 }
 \value{
 data.frame, Character. The submission list in data frame format.

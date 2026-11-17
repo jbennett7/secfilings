@@ -1,0 +1,18 @@
+{
+    "accessionNumber": ["0002222222-25-000002", "0002222222-25-000001"],
+    "filingDate": ["2025-11-05", "2025-06-12"],
+    "reportDate": ["2025-09-30", ""],
+    "acceptanceDateTime": ["2025-11-05T16:01:02.000Z", "2025-06-12T18:30:00.000Z"],
+    "act": ["34", "NE"],
+    "form": ["10-Q", "4"],
+    "fileNumber": ["001-00001", ""],
+    "filmNumber": ["251000002", ""],
+    "items": ["", ""],
+    "core_type": ["10-Q", "4"],
+    "size": [1050, 4200],
+    "isXBRL": [1, 0],
+    "isInlineXBRL": [1, 0],
+    "isXBRLNumeric": [1, 0],
+    "primaryDocument": ["mock-20250930.htm", "xslF345X05/form4.xml"],
+    "primaryDocDescription": ["10-Q", "FORM 4"]
+}
