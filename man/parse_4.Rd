@@ -10,7 +10,7 @@ parse_4(filename)
 \item{filename}{Path to a cached Form 4 \code{.txt} file.}
 }
 \value{
-A named list of 7 tibbles, or \code{NULL} if \code{filename} isn't a parseable
+a named list of 7 tibbles, or \code{NULL} if \code{filename} isn't a parseable
 Form 4.
 }
 \description{

@@ -1,9 +1,10 @@
 #' Build the URL for a filing's sgml file.
 #'
-#' @param cik Character. The company CIK (with or without leading zeros).
-#' @param accession Character. The accession number in dashed format
-#'   (e.g. "0000320193-23-000106").
-#' @return A character string URL.
+#' @noRd
+#' @param cik the company CIK (with or without leading zeros).
+#' @param accession the accession number in dashed format (e.g.
+#' "0000320193-23-000106").
+#' @return a character string URL.
 filing_urls <- function(cik, accession) {
     cik_clean <- sub("^0+", "", cik)
   
@@ -16,11 +17,11 @@ filing_urls <- function(cik, accession) {
 
 #' Retrieve an SGML filing from EDGAR
 #'
-#' @param cik, Character. The company CIK.
-#' @param accession, Character. The accession number in dashed format.
-#' @param useragent, Character. Required by SEC: "Name email@domain.com".
-#' @param cache, Character. Temporary cache for storing filings.
-#' @return Character vector of local file paths, one per accession.
+#' @param cik the company CIK
+#' @param accession the accession number in dashed format
+#' @param useragent required by SEC: "Name email@domain.com"
+#' @param cache cache directory
+#' @return character vector of local file paths, one per accession
 #' @export
 get_filing <- function(cik, accession, useragent, cache = "./.cache") {
     # Normalize so padded and unpadded CIKs share one cache folder.

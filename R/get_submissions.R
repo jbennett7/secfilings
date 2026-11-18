@@ -1,10 +1,9 @@
 #' Retrieve the company EDGAR submissions.
 #'
-#' @param cik, Character. The company CIK.
-#' @param useragent, Character. Required by SEC: "Name email@domain.com"
-#' @param cache, Character. Temporary cache for storing the tickers as a
-#'   csv file.
-#' @return A tibble with one row per filing
+#' @param cik the company CIK.
+#' @param useragent required by SEC: "Name email@domain.com"
+#' @param cache cache directory
+#' @return a tibble with one row per filing
 #' @export
 get_submissions <- function(cik, useragent, cache = "./.cache") {
     if (is.na(cik)) stop("cik is NA (ticker lookup failed?)")
@@ -16,6 +15,9 @@ get_submissions <- function(cik, useragent, cache = "./.cache") {
     }
 }
 
+#' Read a submission file by path
+#'
+#' @noRd
 read_submissions <- function(filepath) {
     tibble::as_tibble(readr::read_csv(filepath,
         na = "",

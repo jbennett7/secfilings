@@ -29,7 +29,7 @@ to_lgl <- function(x) {
 #' derivative activity) still return the correct zero-row schema.
 #'
 #' @param filename Path to a cached Form 4 `.txt` file.
-#' @return A named list of 7 tibbles, or `NULL` if `filename` isn't a parseable
+#' @return a named list of 7 tibbles, or `NULL` if `filename` isn't a parseable
 #'   Form 4.
 #' @export
 parse_4 <- function(filename) {

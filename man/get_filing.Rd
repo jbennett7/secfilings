@@ -7,16 +7,16 @@
 get_filing(cik, accession, useragent, cache = "./.cache")
 }
 \arguments{
-\item{cik, }{Character. The company CIK.}
+\item{cik}{the company CIK}
 
-\item{accession, }{Character. The accession number in dashed format.}
+\item{accession}{the accession number in dashed format}
 
-\item{useragent, }{Character. Required by SEC: "Name email@domain.com".}
+\item{useragent}{required by SEC: "Name email@domain.com"}
 
-\item{cache, }{Character. Temporary cache for storing filings.}
+\item{cache}{cache directory}
 }
 \value{
-Character vector of local file paths, one per accession.
+character vector of local file paths, one per accession
 }
 \description{
 Retrieve an SGML filing from EDGAR

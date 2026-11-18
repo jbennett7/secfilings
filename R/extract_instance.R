@@ -1,9 +1,9 @@
 #' Decode a uuencoded document body into raw bytes
 #'
-#' @param content Character vector of uuencoded lines (the "begin"/"end"
-#'   wrapper lines already stripped).
-#' @return A raw vector of the decoded bytes.
 #' @noRd
+#' @param content vector of uuencoded lines (the "begin"/"end" wrapper lines
+#' already stripped).
+#' @return A raw vector of the decoded bytes.
 uudecode <- function(content) {
     chunks <- vector("list", length(content))
     for (i in seq_along(content)) {
@@ -35,10 +35,10 @@ uudecode <- function(content) {
 
 #' Extract the XBRL instance document from an SEC SGML submission file
 #'
-#' @param sgml_path, Character. Path to the downloaded SGML submission .txt file
-#' @param out_dir, Character. Directory to write the extracted .xml file into.
-#'   Defaults to a temporary directory.
-#' @return Path to the extracted XBRL instance .xml file.
+#' @param sgml_path path to the downloaded SGML submission .txt file
+#' @param out_dir directory to write the extracted .xml file into. Defaults to
+#' a temporary directory.
+#' @return path to the extracted XBRL instance .xml file.
 #' @export
 extract_instance <- function(sgml_path, out_dir = tempdir()) {
     # Create out_dir if it does not exist.

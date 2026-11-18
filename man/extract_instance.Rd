@@ -7,13 +7,13 @@
 extract_instance(sgml_path, out_dir = tempdir())
 }
 \arguments{
-\item{sgml_path, }{Character. Path to the downloaded SGML submission .txt file}
+\item{sgml_path}{path to the downloaded SGML submission .txt file}
 
-\item{out_dir, }{Character. Directory to write the extracted .xml file into.
-Defaults to a temporary directory.}
+\item{out_dir}{directory to write the extracted .xml file into. Defaults to
+a temporary directory.}
 }
 \value{
-Path to the extracted XBRL instance .xml file.
+path to the extracted XBRL instance .xml file.
 }
 \description{
 Extract the XBRL instance document from an SEC SGML submission file

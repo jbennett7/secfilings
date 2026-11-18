@@ -1,10 +1,9 @@
 #' Retrieve the CIK for the given ticker symbol.
 #'
-#' @param ticker, Character. Ticker symbol.
-#' @param useragent, Character. Required by SEC: "Name email@domain.com"
-#' @param cache, Character. Temporary cache for storing the tickers as a
-#'   csv file.
-#' @return 10 character cik string.
+#' @param ticker ticker symbol
+#' @param useragent required by SEC: "Name email@domain.com"
+#' @param cache cache directory
+#' @return the 10-digit zero-padded CIK, or NA if the ticker isn't found
 #' @export
 get_cik <- function(ticker, useragent, cache="./.cache") {
     tickers <- file.path(cache, "tickers.csv")

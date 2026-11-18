@@ -1,10 +1,10 @@
 #' Download the JSON file for the company submissions for the cik.
 #'
-#' @param cik, Character. The CIK of the company.
-#' @param useragent, Character. Required by SEC: "Name email@domain.com"
-#' @param cache, Character. Temporary cache for storing the tickers as a
-#'   csv file.
-#' @return A tibble with one row per filing
+#' @noRd
+#' @param cik the CIK of the company.
+#' @param useragent required by SEC: "Name email@domain.com"
+#' @param cache cache directory
+#' @return a tibble with one row per filing
 download_submissions <- function(cik, useragent, cache="./.cache") {
     message("Downloading submissions: ", cik, "\n")
 

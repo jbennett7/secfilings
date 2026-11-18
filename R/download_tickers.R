@@ -1,8 +1,8 @@
 #' Download the JSON file of ticker to cik numbers from EDGAR
 #'
-#' @param useragent, Character. Required by SEC: "Name email@domain.com"
-#' @param cache, Character. Temporary cache for storing the tickers as a
-#'   csv file.
+#' @noRd
+#' @param useragent required by SEC: "Name email@domain.com"
+#' @param cache cache directory
 #' @return data.frame containing the downloaded list of tickers to cik.
 download_tickers <- function(useragent, cache="./.cache") {
     message("Downloading tickers...")

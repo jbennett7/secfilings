@@ -7,15 +7,14 @@
 get_submissions(cik, useragent, cache = "./.cache")
 }
 \arguments{
-\item{cik, }{Character. The company CIK.}
+\item{cik}{the company CIK.}
 
-\item{useragent, }{Character. Required by SEC: "Name email@domain.com"}
+\item{useragent}{required by SEC: "Name email@domain.com"}
 
-\item{cache, }{Character. Temporary cache for storing the tickers as a
-csv file.}
+\item{cache}{cache directory}
 }
 \value{
-A tibble with one row per filing
+a tibble with one row per filing
 }
 \description{
 Retrieve the company EDGAR submissions.

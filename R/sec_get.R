@@ -1,5 +1,6 @@
 #' sec_get
 #'
+#' @noRd
 #' @param url SEC url
 #' @param useragent SEC mandatory useragent
 #' @param as parsed or raw

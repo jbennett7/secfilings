@@ -1,9 +1,9 @@
 #' Retrieve Company Information
 #'
-#' @param cik Character. The company CIK (with or without leading zeros).
-#' @param useragent, Character. Required by SEC: "Name email@domain.com".
-#' @param cache, Character. Temporary cache for storing the tickers as a
-#' @return Company Information
+#' @param cik the company CIK (padded or unpadded)
+#' @param useragent required by SEC: "Name email@domain.com"
+#' @param cache cache directory
+#' @return the company name, or NA if the CIK isn't found.
 #' @export
 get_company <- function(cik, useragent, cache="./.cache") {
     tickers <- file.path(cache, "tickers.csv")

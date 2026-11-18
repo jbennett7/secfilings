@@ -7,14 +7,14 @@
 get_company(cik, useragent, cache = "./.cache")
 }
 \arguments{
-\item{cik}{Character. The company CIK (with or without leading zeros).}
+\item{cik}{the company CIK (padded or unpadded)}
 
-\item{useragent, }{Character. Required by SEC: "Name email@domain.com".}
+\item{useragent}{required by SEC: "Name email@domain.com"}
 
-\item{cache, }{Character. Temporary cache for storing the tickers as a}
+\item{cache}{cache directory}
 }
 \value{
-Company Information
+the company name, or NA if the CIK isn't found.
 }
 \description{
 Retrieve Company Information
