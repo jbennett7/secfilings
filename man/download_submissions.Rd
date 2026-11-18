@@ -15,7 +15,7 @@ download_submissions(cik, useragent, cache = "./.cache")
 csv file.}
 }
 \value{
-data.frame containing the downloaded submissions.
+A tibble with one row per filing
 }
 \description{
 Download the JSON file for the company submissions for the cik.

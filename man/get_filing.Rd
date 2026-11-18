@@ -13,11 +13,10 @@ get_filing(cik, accession, useragent, cache = "./.cache")
 
 \item{useragent, }{Character. Required by SEC: "Name email@domain.com".}
 
-\item{cache, }{Character. Temporary cache for storing the tickers as a
-csv file.}
+\item{cache, }{Character. Temporary cache for storing filings.}
 }
 \value{
-A data frame with columns: sequence, filename, type, description, size.
+Character vector of local file paths, one per accession.
 }
 \description{
 Retrieve an SGML filing from EDGAR

@@ -19,17 +19,16 @@ filing_urls <- function(cik, accession) {
 #' @param cik, Character. The company CIK.
 #' @param accession, Character. The accession number in dashed format.
 #' @param useragent, Character. Required by SEC: "Name email@domain.com".
-#' @param cache, Character. Temporary cache for storing the tickers as a
-#'   csv file.
-#' @return A data frame with columns: sequence, filename, type, description, size.
+#' @param cache, Character. Temporary cache for storing filings.
+#' @return Character vector of local file paths, one per accession.
 #' @export
 get_filing <- function(cik, accession, useragent, cache = "./.cache") {
-    # Generate the urls to retrieve the sgml files.
+    # Normalize so padded and unpadded CIKs share one cache folder.
+    cik  <- sub("^0+", "", cik)
     urls <- filing_urls(cik, accession)
-    # The path to store the SGML file.
-    file_paths <- paste(cache, "filings", cik, paste0(accession, ".txt"), sep="/")
-    if (!dir.exists(unique(dirname(file_paths))))
-        dir.create(unique(dirname(file_paths)), recursive=TRUE)
+    file_paths <- file.path(cache, "filings", cik, paste0(accession, ".txt"))
+    for (d in unique(dirname(file_paths)))
+        if (!dir.exists(d)) dir.create(d, recursive = TRUE)
     for (i in seq_along(urls)) {
         if (!file.exists(file_paths[i])) {
             message(paste0("Downloading filing: ", accession[i]))
@@ -39,5 +38,5 @@ get_filing <- function(cik, accession, useragent, cache = "./.cache") {
             close(con)
         }
     }
-    return (file_paths)
+    file_paths
 }

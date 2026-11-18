@@ -4,9 +4,9 @@
 \name{secfilings-package}
 \alias{secfilings}
 \alias{secfilings-package}
-\title{secfilings: Parse SEC Filings for data}
+\title{secfilings: Retrieve and Parse SEC EDGAR Filings}
 \description{
-Parse SEC Filings using the edgar package and XBRL package.
+Looks up company identifiers, filing histories and filing documents from the SEC EDGAR system, with a local cache to limit requests. Extracts the documents bundled in a filing, including XBRL instance files and uuencoded attachements, and parses Form 4 insider transactions and Schedule 13G beneifical ownership reports.
 }
 \author{
 \strong{Maintainer}: Joseph Bennett \email{jbennett@jbennettconsulting.com}

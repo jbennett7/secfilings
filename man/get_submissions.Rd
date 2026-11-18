@@ -15,7 +15,7 @@ get_submissions(cik, useragent, cache = "./.cache")
 csv file.}
 }
 \value{
-data.frame, Character. The submission list in data frame format.
+A tibble with one row per filing
 }
 \description{
 Retrieve the company EDGAR submissions.

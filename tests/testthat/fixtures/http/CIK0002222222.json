@@ -17,6 +17,7 @@
             "size": [1000, 1100, 2000],
             "isXBRL": [1, 1, 1],
             "isInlineXBRL": [1, 1, 1],
+            "isXBRLNumeric": [1, 1, 1],
             "primaryDocument": ["mock-20260630.htm", "mock-20260331.htm", "mock-20251231.htm"],
             "primaryDocDescription": ["10-Q", "10-Q", "10-K"]
         },
