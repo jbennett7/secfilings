@@ -7,6 +7,7 @@
 #' @export
 get_submissions <- function(cik, useragent, cache = "./.cache") {
     if (is.na(cik)) stop("cik is NA (ticker lookup failed?)")
+    cik <- pad_cik(cik)
     submissions <- paste0(cache, "/submissions/", cik, ".csv")
     if (!file.exists(submissions)) {
         return(download_submissions(cik, useragent, cache))
@@ -42,3 +43,9 @@ read_submissions <- function(filepath) {
         )
     ))
 }
+
+#' Zero-pad a CIK to the 10 digits SEC's submissions API requires
+#'
+#' @noRd
+#' @param cik the company CIK (padded or unpadded)
+pad_cik <- function(cik) formatC(as.numeric(cik), width = 10, flag = "0", format = "d")

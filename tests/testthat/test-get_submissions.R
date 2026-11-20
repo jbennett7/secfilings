@@ -37,3 +37,25 @@ test_that("get_submissions uses the declared column types", {
     expect_type(df$items, "character")
     expect_type(df$isXBRL, "logical")
 })
+
+test_that("pad_cik will always return padded cik", {
+    expect_equal(pad_cik("732717"), "0000732717")
+    expect_equal(pad_cik("0000732717"), "0000732717")
+})
+
+test_that("get_submissions an unpadded CIK hits the cache (offline)", {
+    cache_dir <- test_path("fixtures", "testcache")
+    # A padded or unpadded cik will return the same rows.
+    unpadded <- get_submissions("1111111", "offline-test", cache_dir)
+    padded   <- get_submissions("0001111111", "offline-test", cache_dir)
+    expect_identical(unpadded, padded)
+})
+
+test_that("get_submissions an unpadded CIK downloads from the padded URL", {
+    local_mock_sec()
+    cache_dir <- withr::local_tempdir()
+    df <- get_submissions("2222222", "offline-test", cache_dir)
+    result <- df$primaryDocDescription[df$accessionNumber == "0002222222-26-000003"]
+    expect_equal(result, "10-Q")
+    expect_true(file.exists(file.path(cache_dir, "submissions", "0002222222.csv")))
+})
