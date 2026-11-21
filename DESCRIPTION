@@ -1,6 +1,6 @@
 Package: secfilings
 Title: Retrieve and Parse SEC EDGAR Filings
-Version: 1.0.3
+Version: 1.1.0
 Authors@R: 
     person("Joseph", "Bennett", , "jbennett@jbennettconsulting.com", role = c("aut", "cre"))
 Description: Looks up company identifiers, filing histories and filing
@@ -20,9 +20,9 @@ Imports:
     stringr,
     tibble,
     utils,
+    jsonlite,
     tools
 Suggests:
     testthat,
-    jsonlite,
     withr
 Config/roxygen2/version: 8.0.0

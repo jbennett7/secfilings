@@ -3,6 +3,7 @@
 export(extract_instance)
 export(get_cik)
 export(get_company)
+export(get_companyfacts)
 export(get_filing)
 export(get_submissions)
 export(parse_13g)

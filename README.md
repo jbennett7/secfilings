@@ -61,6 +61,7 @@ transactions <- bind_rows(lapply(parsed, `[[`, "nonderiv_transactions"))
 |---|---|
 | `get_cik(ticker, useragent, cache)` | 10-digit CIK string, or `NA` if the ticker is unknown |
 | `get_company(cik, useragent, cache)` | Company name, or `NA` if the CIK is unknown |
+| `get_companyfacts(cik, useragent, cache, refresh)` | Tibble with one row per fact entry (every tag, unit and period); values repeated in later filings are not deduplicated |
 | `get_submissions(cik, useragent, cache)` | Tibble with one row per filing, all pages included |
 | `get_filing(cik, accession, useragent, cache)` | Path(s) to the downloaded SGML `.txt`; vectorized over `accession` |
 | `extract_instance(sgml_path, out_dir)` | `out_dir`, after writing every document in the filing to it (uuencoded attachments are decoded, zips unzipped) |
@@ -79,12 +80,14 @@ Every download is cached under `cache` (default `./.cache`) and reused on later 
 ```
 .cache/
 |--tickers.csv                      # get_cik, get_company
-|--submissions/<cik>.csv            # get_submissions
+|--submissions/<10-digit cik>.csv   # get_submissions
 |--filings/<cik>/<accession>.txt    # get_filing
+|--companyfacts/CIK##########.json  # get_companyfacts
 ```
 
-Delete a file to force a fresh download. The ticker list and submissions change
-over time; filings never do.
+Delete a file, or pass `refresh = TRUE` to `get_companyfacts`, to force a fresh
+download. The ticker list, submissions and company facts change over time;
+filings never do.
 
 ## Notes
 

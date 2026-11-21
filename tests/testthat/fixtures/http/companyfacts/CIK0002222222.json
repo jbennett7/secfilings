@@ -1,0 +1,77 @@
+{
+    "cik": 2222222,
+    "entityName": "Mock Two",
+    "facts": {
+        "dei": {
+            "EntityCommonStockSharesOutstanding": {
+                "label": "Entity Common Stock, Shares Outstanding",
+                "description": "Number of shares of common stock outstanding.",
+                "units": {
+                    "shares": [
+                        { "end": "2026-04-30", "val": 7150000000,
+                          "accn": "0002222222-26-000002", "fy": 2026, "fp": "Q1",
+                          "form": "10-Q", "filed": "2026-05-05" }
+                    ]
+                }
+            }
+        },
+        "us-gaap": {
+            "Revenues": {
+                "label": "Revenues",
+                "description": "Amount of revenue recognized.",
+                "units": {
+                    "USD": [
+                        {
+                          "start": "2024-01-01", "end": "2024-12-31", "val": 900000000,
+                          "accn": "0002222222-25-000001", "fy": 2024, "fp": "FY",
+                          "form": "10-K", "filed": "2025-02-21", "frame": "CY2024"
+                        },
+                        {
+                          "start": "2024-01-01", "end": "2024-12-31", "val": 900000000,
+                          "accn": "0002222222-26-000001", "fy": 2025, "fp": "FY",
+                          "form": "10-K", "filed": "2026-02-20"
+                        },
+                        {
+                          "start": "2025-01-01", "end": "2025-12-31", "val": 1000000000,
+                          "accn": "0002222222-26-000001", "fy": 2025, "fp": "FY",
+                          "form": "10-K", "filed": "2026-02-20", "frame": "CY2025"
+                        },
+                        {
+                          "start": "2026-01-01", "end": "2026-03-31", "val": 260000000,
+                          "accn": "0002222222-26-000002", "fy": 2026, "fp": "Q1",
+                          "form": "10-Q", "filed": "2026-05-05"
+                        }
+                    ]
+                }
+            },
+            "EarningsPerShareDiluted": {
+                "label": "Earnings Per Share, Diluted",
+                "description": "Net income (loss) per share, assuming dilutive potential common shares were issued.",
+                "units": {
+                    "USD/shares": [
+                        {
+                          "start": "2025-01-01", "end": "2025-12-31", "val": 1.25,
+                          "accn": "0002222222-26-000001", "fy": 2025, "fp": "FY",
+                          "form": "10-K", "filed": "2026-02-20", "frame": "CY2025"
+                        }
+                    ]
+                }
+            },
+            "Assets": {
+                "label": "Assets",
+                "description": "Sum of the carrying amounts as of the balance sheet date of all assets that are recognized.",
+                "units": {
+                    "USD": [
+                        {
+                          "end": "2025-12-31", "val": 5000000000,
+                          "accn": "0002222222-26-000001", "fy": 2025, "fp": "FY",
+                          "form": "10-K", "filed": "2026-02-20", "frame": "CY2025Q4I"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
+
+
